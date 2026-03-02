@@ -38,9 +38,11 @@ Add the marketplace and install:
 
 Then invoke skills directly:
 ```
-/helixlab:vision-replay /path/to/video.webm analyze the animation
+/helixlab:vision-replay <video-path> <analysis-prompt>
 /helixlab:help
 ```
+
+> Any ffmpeg-supported format works: mp4, webm, mov, mkv, avi, flv, etc.
 
 > [!TIP]
 > Use `--scope project` when installing to share the plugin configuration with teammates via Git:
@@ -161,12 +163,12 @@ bash skills/vision-replay/scripts/cleanup.sh /tmp/claude-video-frames/1234567890
 
 ## Contributing
 
-1. Fork the repo
-2. Add your skill to `skills/<skill-name>/`
-3. Include a `SKILL.md` with YAML frontmatter
-4. Update `AGENTS.md`, `GEMINI.md`, and `.cursor/rules/` with your skill's instructions
-5. Add tests to `tests/`
-6. Submit a PR
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines on:
+
+- Reporting bugs and suggesting features
+- Submitting pull requests
+- Script conventions and skill structure requirements
+- Commit message format and versioning
 
 ## License
 

@@ -11,6 +11,7 @@ allowed-tools:
   - Read
   - Glob
   - Grep
+  - AskUserQuestion
 ---
 
 <essential_principles>
@@ -72,11 +73,19 @@ Based on the user's request AND what you see in the contact sheet, route to the 
 </universal_pipeline>
 
 <intake>
-Detect the analysis type from the user's prompt, context, and the contact sheet overview.
+Parse `$ARGUMENTS` for a video path and analysis instructions. Read `references/question-templates.md` at intake time and use its JSON structures as-is, filling in any `{placeholder}` values from runtime context (video-info.sh output, glob results, etc.).
 
-The user's message after `/helixlab:vision-replay` is available as `$ARGUMENTS`. Parse it for the video path and analysis instructions.
+**Structured intake gate — follow in order, stopping at the first match:**
 
-**If the video path is ambiguous or missing, ask the user.**
+1. **If video path is missing:** Use Template 1 (Missing video path) to help the user locate their file.
+2. **If path is a directory or glob with multiple matches:** Use Template 5 (Multiple videos found) — populate options dynamically from found files.
+3. **If video path is found:** Run `scripts/video-info.sh` to get metadata, then:
+   - **If no analysis prompt was provided:** Use Template 2 (Video confirmed — missing analysis prompt). Fill in metadata placeholders before presenting.
+   - **If prompt is ambiguous** (keywords don't clearly match the routing table): Use Template 3 (Analysis type selection).
+4. **If video is >30s:** Use Template 6 (Long video scope) to ask about trimming.
+5. **If animation analysis is selected and video >3s or no fps hint:** Use Template 4 (FPS selection).
+6. **If workflow review is selected:** Use Template 7 (Extraction strategy).
+7. **If all arguments are present and clear:** Proceed directly to the universal pipeline.
 </intake>
 
 <routing>
@@ -121,6 +130,7 @@ All domain knowledge in `references/`:
 
 **Frame rates:** references/fps-strategy.md -- When to use 5, 10, 30, or 60 fps
 **ffmpeg commands:** references/ffmpeg-recipes.md -- Crop, scale, timestamp overlay, scene detection
+**Question templates:** references/question-templates.md -- AskUserQuestion templates for intake flow
 </reference_index>
 
 <workflows_index>
