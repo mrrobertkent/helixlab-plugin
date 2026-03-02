@@ -10,6 +10,12 @@ HelixLab is a growing collection of developer tools that work with any AI coding
 
 > [!IMPORTANT]
 > ffmpeg must be installed before using any HelixLab tools. Without it, video analysis scripts will fail immediately.
+>
+> The setup skill can detect your OS and handle installation automatically:
+> ```
+> /helixlab:setup
+> ```
+> Or run manually: `bash scripts/setup.sh`
 
 | Platform | Install Command |
 |----------|----------------|
