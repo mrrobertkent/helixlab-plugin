@@ -162,6 +162,7 @@ if command -v claude &>/dev/null || [[ -d "$HOME/.claude" ]]; then
   info "Install as plugin:"
   echo -e "    ${BOLD}/plugin marketplace add https://github.com/mrrobertkent/helixlab-plugin${NC}"
   echo -e "    ${BOLD}/plugin install helixlab${NC}"
+  info "Add --scope project to share the plugin with teammates via Git"
   AGENT_FOUND=true
 fi
 

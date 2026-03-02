@@ -4,6 +4,8 @@ HelixLab provides shell-script-based developer tools that any AI coding agent ca
 
 ## Getting Started
 
+> This file is project-level configuration. Place it in your project root so your AI coding agent can read it.
+
 Run the setup script to check dependencies and get integration guidance for your agent:
 
 ```bash
