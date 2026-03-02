@@ -1,0 +1,12 @@
+# Development artifacts — not part of the plugin
+.claude/
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp
+/tmp/
+*.swp
+*~
