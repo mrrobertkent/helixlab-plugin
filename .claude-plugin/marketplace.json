@@ -9,12 +9,13 @@
     {
       "name": "helixlab",
       "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "source": "./",
       "author": {
         "name": "Robert Kent Jr.",
         "url": "https://helixlab.app"
-      }
+      },
+      "category": "development"
     }
   ]
 }

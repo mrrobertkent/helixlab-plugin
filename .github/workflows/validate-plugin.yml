@@ -1,0 +1,109 @@
+name: Validate Plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON syntax
+        run: |
+          echo "=== Validating plugin.json ==="
+          python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))"
+          echo "  PASS: plugin.json is valid JSON"
+
+          echo ""
+          echo "=== Validating marketplace.json ==="
+          python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"
+          echo "  PASS: marketplace.json is valid JSON"
+
+      - name: Check required fields
+        run: |
+          echo "=== Checking plugin.json required fields ==="
+          python3 -c "
+          import json, sys
+          data = json.load(open('.claude-plugin/plugin.json'))
+          errors = []
+          if 'name' not in data:
+              errors.append('Missing required field: name')
+          if 'version' not in data:
+              errors.append('Missing required field: version')
+          if errors:
+              for e in errors:
+                  print(f'  FAIL: {e}')
+              sys.exit(1)
+          print(f'  PASS: name={data[\"name\"]}, version={data[\"version\"]}')
+          "
+
+          echo ""
+          echo "=== Checking marketplace.json required fields ==="
+          python3 -c "
+          import json, sys
+          data = json.load(open('.claude-plugin/marketplace.json'))
+          errors = []
+          if 'name' not in data:
+              errors.append('Missing required field: name')
+          if 'plugins' not in data or len(data['plugins']) == 0:
+              errors.append('Missing or empty plugins array')
+          if errors:
+              for e in errors:
+                  print(f'  FAIL: {e}')
+              sys.exit(1)
+          print(f'  PASS: marketplace={data[\"name\"]}, plugins={len(data[\"plugins\"])}')
+          "
+
+      - name: Check version sync
+        run: |
+          echo "=== Checking version sync between plugin.json and marketplace.json ==="
+          python3 -c "
+          import json, sys
+          plugin = json.load(open('.claude-plugin/plugin.json'))
+          marketplace = json.load(open('.claude-plugin/marketplace.json'))
+
+          plugin_version = plugin.get('version')
+          marketplace_version = None
+          for p in marketplace.get('plugins', []):
+              if p.get('name') == plugin.get('name'):
+                  marketplace_version = p.get('version')
+                  break
+
+          if not plugin_version:
+              print('  FAIL: No version in plugin.json')
+              sys.exit(1)
+          if not marketplace_version:
+              print('  FAIL: No version in marketplace.json for plugin')
+              sys.exit(1)
+          if plugin_version != marketplace_version:
+              print(f'  FAIL: Version mismatch — plugin.json={plugin_version}, marketplace.json={marketplace_version}')
+              sys.exit(1)
+          print(f'  PASS: Versions in sync at {plugin_version}')
+          "
+
+      - name: Validate semver format
+        run: |
+          echo "=== Checking semver format ==="
+          python3 -c "
+          import json, re, sys
+          version = json.load(open('.claude-plugin/plugin.json')).get('version', '')
+          if not re.match(r'^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$', version):
+              print(f'  FAIL: \"{version}\" is not valid semver (expected MAJOR.MINOR.PATCH)')
+              sys.exit(1)
+          print(f'  PASS: {version} is valid semver')
+          "
+
+  test-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg bc
+
+      - name: Run script tests
+        run: bash tests/test-scripts.sh --check-ffmpeg
