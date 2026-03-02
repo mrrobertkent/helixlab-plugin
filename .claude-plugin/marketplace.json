@@ -1,0 +1,20 @@
+{
+  "name": "helixlab",
+  "description": "Open-source developer tools and skills for AI coding agents",
+  "owner": {
+    "name": "Robert Kent Jr.",
+    "url": "https://helixlab.app"
+  },
+  "plugins": [
+    {
+      "name": "helixlab",
+      "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Robert Kent Jr.",
+        "url": "https://helixlab.app"
+      }
+    }
+  ]
+}
