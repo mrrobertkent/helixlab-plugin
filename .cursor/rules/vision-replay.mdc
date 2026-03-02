@@ -1,0 +1,32 @@
+---
+description: "Video frame analysis using ffmpeg + AI vision. Use when working with video files, screen recordings, animation validation, or visual analysis."
+globs: ["**/*.mp4", "**/*.webm", "**/*.mov", "**/*.avi", "**/*.mkv"]
+alwaysApply: false
+---
+
+# Vision Replay — Video Frame Analysis
+
+When working with video files, use the HelixLab vision-replay scripts for frame extraction and analysis.
+
+## Quick Start
+
+1. Get metadata: `bash skills/vision-replay/scripts/video-info.sh "<video>"`
+2. Contact sheet: `bash skills/vision-replay/scripts/contact-sheet.sh "<video>" "/tmp/frames/sheet.png"`
+3. Extract frames: `bash skills/vision-replay/scripts/extract-frames.sh "<video>" "/tmp/frames" 10`
+4. Clean up: `bash skills/vision-replay/scripts/cleanup.sh "/tmp/frames"`
+
+## Workflow Guides
+
+- Animation: `skills/vision-replay/workflows/animation-analysis.md`
+- Page load: `skills/vision-replay/workflows/page-load-analysis.md`
+- Workflow review: `skills/vision-replay/workflows/workflow-review.md`
+
+## FPS Selection
+
+| Use Case | FPS |
+|----------|-----|
+| Fast animations (<200ms) | 30-60 |
+| Standard transitions (200-500ms) | 10-15 |
+| Slow transitions (>500ms) | 5-10 |
+| Page load | Progressive (use extract-progressive.sh) |
+| Workflow review | 2-3 or scene-detect |
