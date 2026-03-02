@@ -1,5 +1,7 @@
 ---
-description: "Show HelixLab plugin info — available skills, prerequisites, version, and installation status"
+name: help
+description: Show HelixLab plugin info, available skills, prerequisites, and version
+disable-model-invocation: true
 ---
 
 # HelixLab — Developer Tools for AI Coding Agents
@@ -14,6 +16,7 @@ description: "Show HelixLab plugin info — available skills, prerequisites, ver
 | Skill | Invoke | Description |
 |-------|--------|-------------|
 | Vision Replay | `/helixlab:vision-replay <video-path> [instructions]` | Extract frames from video files using ffmpeg and analyze them with AI vision. Supports animation timing analysis, page load performance review, and user workflow progression. |
+| Setup | `/helixlab:setup [--check]` | Check prerequisites and install dependencies (ffmpeg, ffprobe, bc). Detects your OS and AI coding agent for tailored setup guidance. |
 
 ## Prerequisites
 
@@ -24,6 +27,8 @@ description: "Show HelixLab plugin info — available skills, prerequisites, ver
   - Windows: Requires WSL2 with `sudo apt install ffmpeg bc`
 - **bash** shell (available on macOS, Linux, Windows WSL)
 - **bc** calculator (installed by default on macOS, may need install on minimal Linux)
+
+Run `/helixlab:setup --check` to verify all prerequisites are met.
 
 ## Quick Start
 
