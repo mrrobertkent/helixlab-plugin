@@ -59,6 +59,30 @@ git clone https://github.com/mrrobertkent/helixlab-plugin.git
 bash helixlab-plugin/skills/vision-replay/scripts/video-info.sh /path/to/video.mp4
 ```
 
+## Quick Setup
+
+Run the setup script to check dependencies, install anything missing, and get agent-specific integration guidance:
+
+```bash
+bash scripts/setup.sh
+```
+
+Check-only mode (no install prompts):
+```bash
+bash scripts/setup.sh --check
+```
+
+Non-interactive mode (auto-install):
+```bash
+bash scripts/setup.sh --yes
+```
+
+Or use the skill in Claude Code:
+```
+/helixlab:setup
+/helixlab:setup --check
+```
+
 ## Available Skills
 
 ### Vision Replay

@@ -2,6 +2,16 @@
 
 HelixLab provides shell-script-based developer tools that any AI coding agent can use. Each tool is a self-contained bash script with markdown workflow guides.
 
+## Getting Started
+
+Run the setup script to check dependencies and get integration guidance for your agent:
+
+```bash
+bash scripts/setup.sh --check
+```
+
+This detects your OS, verifies ffmpeg/ffprobe/bc are installed, identifies your AI coding agent, and provides tailored next steps.
+
 ## Prerequisites
 
 Before using any HelixLab tools, ensure these are installed:
