@@ -28,6 +28,8 @@ fail() {
 
 SCRIPTS=(
   "video-info.sh"
+  "normalize-video.sh"
+  "dedupe-video.sh"
   "extract-frames.sh"
   "extract-progressive.sh"
   "contact-sheet.sh"
@@ -90,6 +92,16 @@ if [[ "$CHECK_FFMPEG" == true ]]; then
     pass "bc is installed"
   else
     fail "bc is NOT installed"
+  fi
+
+  # drawtext filter for timestamp overlay
+  if ffmpeg -filters 2>/dev/null | grep "drawtext" > /dev/null; then
+    pass "drawtext filter available (timestamp overlay enabled)"
+  else
+    echo "  WARN: drawtext filter missing — timestamp overlays will be disabled"
+    echo "        macOS: Download static build from https://ffmpeg.martin-riedl.de"
+    echo "        macOS: Or run: bash scripts/setup.sh --yes"
+    echo "        Linux: sudo apt install ffmpeg (includes drawtext by default)"
   fi
 fi
 

@@ -19,9 +19,15 @@ This detects your OS, verifies ffmpeg/ffprobe/bc are installed, identifies your 
 Before using any HelixLab tools, ensure these are installed:
 
 - **ffmpeg** and **ffprobe** (video processing)
-  - macOS: `brew install ffmpeg`
-  - Linux: `sudo apt install ffmpeg bc`
+  - macOS: Run `bash scripts/setup.sh` to auto-detect and install a fully-featured ffmpeg
+  - Or download directly from https://ffmpeg.martin-riedl.de (static builds with all filters)
+  - The standard `brew install ffmpeg` on macOS does NOT include drawtext (timestamp overlays)
+  - Linux: `sudo apt install ffmpeg bc` (includes drawtext by default)
   - Windows: Requires WSL2 with `sudo apt install ffmpeg bc`
+- **ffmpeg with drawtext support** (timestamp overlays)
+  - Verify: `ffmpeg -filters 2>/dev/null | grep drawtext`
+  - Required for normalize-video.sh and dedupe-video.sh timestamp overlays
+  - Scripts degrade gracefully without it — timestamps are skipped
 - **bash** shell
 - **bc** calculator
 
@@ -45,17 +51,38 @@ bash skills/vision-replay/scripts/video-info.sh "<video-path>"
 
 Returns: duration, fps, resolution, codec, frame count, VFR detection.
 
-**Step 2: Generate contact sheet overview**
+**Step 2: Normalize the video (downscale + timestamps)**
 
 ```bash
 WORK_DIR="/tmp/claude-video-frames/$(date +%s)"
 mkdir -p "$WORK_DIR"
-bash skills/vision-replay/scripts/contact-sheet.sh "<video-path>" "$WORK_DIR/contact-sheet.png" 5 5
+bash skills/vision-replay/scripts/normalize-video.sh "<video-path>" "$WORK_DIR/normalized.mp4"
+```
+
+Caps the longest dimension at 1920px (desktop, mobile, tablet — all handled dynamically). Burns timestamp overlay into frames if ffmpeg has libfreetype support. Timestamps must be applied BEFORE dedup so timing gaps are visible in the final frames.
+
+**Step 3: Remove static/unchanged frames (optional but recommended)**
+
+Choose a threshold based on the analysis type:
+- **1** for animation analysis (preserves subtle easing, fades, micro-interactions)
+- **3** for page load analysis (preserves progressive rendering changes)
+- **15** for workflow review (keeps only major state changes)
+
+```bash
+bash skills/vision-replay/scripts/dedupe-video.sh "$WORK_DIR/normalized.mp4" "$WORK_DIR/deduped.mp4" <threshold>
+```
+
+Removes frames with no visual change, producing a shorter video. Use the deduped video for all subsequent steps if reduction is significant (>10%). Reports original duration, deduped duration, and reduction percentage.
+
+**Step 4: Generate contact sheet overview**
+
+```bash
+bash skills/vision-replay/scripts/contact-sheet.sh "$WORK_DIR/deduped.mp4" "$WORK_DIR/contact-sheet.png" 5 5
 ```
 
 View the contact sheet to understand what's in the video.
 
-**Step 3: Extract frames based on analysis type**
+**Step 5: Extract frames based on analysis type**
 
 For animation analysis (configurable fps):
 ```bash
@@ -74,20 +101,20 @@ bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/fr
 bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 0 --scene-detect
 ```
 
-**Step 4: Batch frames if needed (>20 frames)**
+**Step 6: Batch frames if needed (>20 frames)**
 
 ```bash
 bash skills/vision-replay/scripts/batch-frames.sh "$WORK_DIR/frames" 15
 ```
 
-**Step 5: Analyze frames visually**
+**Step 7: Analyze frames visually**
 
 Read the extracted PNG frames and analyze them based on the workflow type. See workflow guides:
 - `skills/vision-replay/workflows/animation-analysis.md`
 - `skills/vision-replay/workflows/page-load-analysis.md`
 - `skills/vision-replay/workflows/workflow-review.md`
 
-**Step 6: Clean up**
+**Step 8: Clean up**
 
 ```bash
 bash skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
@@ -98,6 +125,8 @@ bash skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `video-info.sh` | Video metadata | `<video-path>` |
+| `normalize-video.sh` | Downscale + timestamp overlay | `<input-video> <output-video> [max-dimension]` |
+| `dedupe-video.sh` | Remove static/unchanged frames | `<input-video> <output-video> [threshold]` |
 | `extract-frames.sh` | Extract at configurable fps | `<video> <out-dir> <fps> [start] [duration] [crop] [scale]` |
 | `extract-progressive.sh` | Lighthouse-style intervals | `<video> <out-dir>` |
 | `contact-sheet.sh` | Grid overview image | `<video> <out-path> [fps] [cols]` |

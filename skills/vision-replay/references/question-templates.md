@@ -237,3 +237,33 @@ Use when workflow review is selected to choose between scene detection and fixed
   ]
 }
 ```
+
+---
+
+## Template 8: Workflow Review — Animation Sensitivity
+
+Use when workflow review is selected to determine dedup sensitivity. This controls whether subtle animations (fades, slides, easing) are preserved or only major state changes (navigation, modals, field updates) are kept.
+
+```json
+{
+  "questions": [
+    {
+      "question": "Does this workflow include animations you want to analyze, or are you focused on state changes like navigation, form updates, and modals?",
+      "header": "Detail level",
+      "options": [
+        {
+          "label": "State changes only (Recommended)",
+          "description": "Keep major visual changes — page navigation, modal opens, form submissions, content updates. Drops subtle animations."
+        },
+        {
+          "label": "Include animations",
+          "description": "Also preserve subtle transitions — fades, slides, loading spinners, hover effects. More frames to review."
+        }
+      ],
+      "multiSelect": false
+    }
+  ]
+}
+```
+
+If the user selects "State changes only", use dedup threshold 15 (coarse). If "Include animations", use threshold 1 (sensitive).
