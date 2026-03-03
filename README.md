@@ -19,11 +19,17 @@ HelixLab is a growing collection of developer tools that work with any AI coding
 
 | Platform | Install Command |
 |----------|----------------|
-| macOS | `brew install ffmpeg` |
+| macOS | Run `bash scripts/setup.sh` (downloads static build with all filters) |
 | Debian / Ubuntu | `sudo apt install ffmpeg bc` |
 | RHEL / Fedora | `sudo dnf install ffmpeg bc` |
 | Arch Linux | `sudo pacman -S ffmpeg bc` |
 | Windows | Requires WSL2: `sudo apt install ffmpeg bc` |
+
+> [!NOTE]
+> HelixLab requires ffmpeg with drawtext filter support for timestamp overlays.
+> The standard `brew install ffmpeg` on macOS does **not** include this.
+> The setup script downloads a [static build](https://ffmpeg.martin-riedl.de)
+> with all required filters included.
 
 Verify installation:
 ```bash
@@ -150,17 +156,20 @@ Extract frames from video files using ffmpeg and analyze them with AI vision cap
 # Get video info
 bash skills/vision-replay/scripts/video-info.sh recording.webm
 
+# Normalize (downscale + timestamp overlay)
+bash skills/vision-replay/scripts/normalize-video.sh recording.webm /tmp/normalized.mp4
+
+# Remove static/unchanged frames (threshold: 1=animation, 3=page-load, 15=workflow)
+bash skills/vision-replay/scripts/dedupe-video.sh /tmp/normalized.mp4 /tmp/deduped.mp4 5
+
 # Generate contact sheet overview
-bash skills/vision-replay/scripts/contact-sheet.sh recording.webm /tmp/sheet.png
+bash skills/vision-replay/scripts/contact-sheet.sh /tmp/deduped.mp4 /tmp/sheet.png
 
 # Extract frames at 10fps
-bash skills/vision-replay/scripts/extract-frames.sh recording.webm /tmp/frames 10
-
-# Extract with Lighthouse-style progressive intervals
-bash skills/vision-replay/scripts/extract-progressive.sh recording.webm /tmp/frames
+bash skills/vision-replay/scripts/extract-frames.sh /tmp/deduped.mp4 /tmp/frames 10
 
 # Clean up
-bash skills/vision-replay/scripts/cleanup.sh /tmp/claude-video-frames/1234567890
+bash skills/vision-replay/scripts/cleanup.sh /tmp/frames
 ```
 
 </details>

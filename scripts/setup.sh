@@ -61,16 +61,55 @@ detect_os() {
   fi
 }
 
+detect_arch() {
+  local machine
+  machine=$(uname -m)
+  case "$machine" in
+    x86_64|amd64) echo "amd64" ;;
+    arm64|aarch64) echo "arm64" ;;
+    *) echo "unknown" ;;
+  esac
+}
+
 install_command_for() {
   local os="$1"
   case "$os" in
-    macos-brew)    echo "brew install ffmpeg" ;;
-    macos)         echo "# Install Homebrew first: https://brew.sh, then: brew install ffmpeg" ;;
+    macos-brew|macos)
+      local arch
+      arch=$(detect_arch)
+      echo "# Download static ffmpeg (includes drawtext): curl -L -o /tmp/ffmpeg.zip https://ffmpeg.martin-riedl.de/redirect/latest/macos/${arch}/release/ffmpeg.zip && curl -L -o /tmp/ffprobe.zip https://ffmpeg.martin-riedl.de/redirect/latest/macos/${arch}/release/ffprobe.zip && mkdir -p ~/.local/bin && unzip -o /tmp/ffmpeg.zip -d ~/.local/bin/ && unzip -o /tmp/ffprobe.zip -d ~/.local/bin/ && chmod +x ~/.local/bin/ffmpeg ~/.local/bin/ffprobe && rm /tmp/ffmpeg.zip /tmp/ffprobe.zip" ;;
     debian|wsl)    echo "sudo apt update && sudo apt install -y ffmpeg bc" ;;
     rhel)          echo "sudo dnf install -y ffmpeg bc" ;;
     arch)          echo "sudo pacman -S --noconfirm ffmpeg bc" ;;
     *)             echo "# Install ffmpeg, ffprobe, and bc using your package manager" ;;
   esac
+}
+
+install_static_ffmpeg() {
+  local os arch base_url
+  os=$(uname -s | tr '[:upper:]' '[:lower:]')
+  arch=$(detect_arch)
+  [[ "$os" == "darwin" ]] && os="macos"
+  base_url="https://ffmpeg.martin-riedl.de/redirect/latest/${os}/${arch}/release"
+
+  if [[ "$arch" == "unknown" ]]; then
+    err "Unsupported architecture: $(uname -m)"
+    return 1
+  fi
+
+  info "Downloading static ffmpeg for ${os}/${arch}..."
+  curl -L -o /tmp/ffmpeg.zip "${base_url}/ffmpeg.zip" || { err "Download failed"; return 1; }
+  curl -L -o /tmp/ffprobe.zip "${base_url}/ffprobe.zip" || { err "Download failed"; return 1; }
+
+  mkdir -p ~/.local/bin
+  unzip -o /tmp/ffmpeg.zip -d ~/.local/bin/ || { err "Unzip failed"; return 1; }
+  unzip -o /tmp/ffprobe.zip -d ~/.local/bin/ || { err "Unzip failed"; return 1; }
+  chmod +x ~/.local/bin/ffmpeg ~/.local/bin/ffprobe
+  rm -f /tmp/ffmpeg.zip /tmp/ffprobe.zip
+
+  ok "Installed ffmpeg and ffprobe to ~/.local/bin/"
+  info "Ensure ~/.local/bin is in your PATH (add to ~/.zshrc or ~/.bashrc):"
+  echo -e "    ${BOLD}export PATH=\"\$HOME/.local/bin:\$PATH\"${NC}"
 }
 
 os_label_for() {
@@ -119,25 +158,69 @@ done
 
 if [[ ${#MISSING[@]} -eq 0 ]]; then
   echo -e "\n${GREEN}${BOLD}All dependencies installed.${NC}"
+
+  # Check for drawtext filter (required for timestamp overlays)
+  echo -e "\n${CYAN}Optional Features${NC}"
+  if ffmpeg -filters 2>/dev/null | grep -q "drawtext"; then
+    ok "drawtext filter available (timestamp overlay enabled)"
+  else
+    warn "drawtext filter missing (timestamp overlay disabled)"
+    case "$OS" in
+      macos-brew|macos)
+        info "The standard brew install does NOT include drawtext"
+        info "Download a static build with all filters:"
+        echo -e "    ${BOLD}bash scripts/setup.sh --yes${NC}  (auto-install static build)"
+        echo -e "    Or manually from: ${BOLD}https://ffmpeg.martin-riedl.de${NC}"
+        ;;
+      *)
+        info "Install ffmpeg from your distro package manager (includes drawtext by default)"
+        ;;
+    esac
+  fi
 else
   INSTALL_CMD=$(install_command_for "$OS")
   echo -e "\n${YELLOW}${BOLD}Missing: ${MISSING[*]}${NC}"
-  info "Install command: ${BOLD}${INSTALL_CMD}${NC}"
+
+  case "$OS" in
+    macos-brew|macos)
+      info "Recommended: Install static ffmpeg build (includes drawtext filter):"
+      echo -e "    ${BOLD}bash scripts/setup.sh --yes${NC}  (auto-download + install)"
+      echo -e "    Or manually from: ${BOLD}https://ffmpeg.martin-riedl.de${NC}"
+      ;;
+    *)
+      info "Install command: ${BOLD}${INSTALL_CMD}${NC}"
+      ;;
+  esac
 
   if [[ "$CHECK_ONLY" == true ]]; then
     echo -e "\n  Run ${BOLD}bash scripts/setup.sh${NC} (without --check) to install."
   elif [[ "$AUTO_YES" == true ]]; then
     echo ""
-    info "Installing (--yes)..."
-    eval "$INSTALL_CMD"
+    case "$OS" in
+      macos-brew|macos)
+        info "Installing static ffmpeg build (--yes)..."
+        install_static_ffmpeg
+        ;;
+      *)
+        info "Installing (--yes)..."
+        eval "$INSTALL_CMD"
+        ;;
+    esac
     echo ""
     ok "Installation complete. Re-run to verify."
-  elif [[ "$OS" != "unknown" && "$OS" != "linux-unknown" && "$OS" != "macos" ]]; then
+  elif [[ "$OS" != "unknown" && "$OS" != "linux-unknown" ]]; then
     echo ""
     read -rp "  Install now? [Y/n] " REPLY
     REPLY=${REPLY:-Y}
     if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-      eval "$INSTALL_CMD"
+      case "$OS" in
+        macos-brew|macos)
+          install_static_ffmpeg
+          ;;
+        *)
+          eval "$INSTALL_CMD"
+          ;;
+      esac
       echo ""
       ok "Installation complete. Re-run to verify."
     else

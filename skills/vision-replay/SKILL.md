@@ -30,10 +30,11 @@ Then run scripts as: `bash "$SCRIPTS_DIR/<script-name>.sh" <args>`
 **Universal first-pass:** Every analysis starts with:
 1. Validate prerequisites (ffmpeg installed, file exists, valid video)
 2. Run `$SCRIPTS_DIR/video-info.sh` to get metadata
-3. Deduplicate static frames with `$SCRIPTS_DIR/dedupe-video.sh` (skip if `--pre-deduped` flag is present)
-4. Run `$SCRIPTS_DIR/contact-sheet.sh` to generate a low-fps overview grid
-5. Review the contact sheet to confirm/adjust extraction strategy
-6. Then route to the appropriate workflow for targeted extraction and analysis
+3. Normalize the video with `$SCRIPTS_DIR/normalize-video.sh` (downscale + timestamp overlay)
+4. Deduplicate static frames with `$SCRIPTS_DIR/dedupe-video.sh` (skip if `--pre-deduped` flag is present)
+5. Run `$SCRIPTS_DIR/contact-sheet.sh` to generate a low-fps overview grid
+6. Review the contact sheet to confirm/adjust extraction strategy
+7. Then route to the appropriate workflow for targeted extraction and analysis
 
 **Frame storage:** All frames go to `/tmp/claude-video-frames/<timestamp>/`. Always clean up after analysis using `$SCRIPTS_DIR/cleanup.sh`.
 
@@ -65,29 +66,50 @@ bash "$SCRIPTS_DIR/video-info.sh" "<video-path>"
 
 Review the output: duration, fps, resolution. This informs fps selection.
 
-**Step 2: Deduplicate static frames**
+**Step 2: Normalize the video**
+
+Downscales high-resolution recordings (retina, tablet, mobile) and burns timestamp overlays into frames. Timestamps must be applied BEFORE deduplication so the agent can see original timing gaps in deduped output.
+
+```bash
+bash "$SCRIPTS_DIR/normalize-video.sh" "<video-path>" "$WORK_DIR/normalized.mp4"
+```
+
+The script caps the longest dimension at 1920px (configurable via third argument), preserves aspect ratio, and adds timestamp text if ffmpeg has libfreetype support. Use `$WORK_DIR/normalized.mp4` for all subsequent steps.
+
+**Step 3: Deduplicate static frames**
 
 Skip this step if the `--pre-deduped` flag was passed in `$ARGUMENTS` (the video has already been deduped by another skill).
 
+Choose the threshold based on the analysis type determined at intake:
+
+| Analysis Type | Threshold | Rationale |
+|---------------|-----------|-----------|
+| Animation | 1 | Preserves subtle easing, fades, micro-interactions |
+| Page load | 3 | Preserves progressive rendering changes |
+| Workflow review | 15 | Keeps only major state changes (navigation, modals, field updates) |
+| Unknown/general | 1 | Safe default — preserves all motion |
+
 ```bash
-bash "$SCRIPTS_DIR/dedupe-video.sh" "<video-path>" "$WORK_DIR/deduped.mp4"
+bash "$SCRIPTS_DIR/dedupe-video.sh" "$WORK_DIR/normalized.mp4" "$WORK_DIR/deduped.mp4" <threshold>
 ```
 
-Review the output: if reduction is significant (>10%), use `$WORK_DIR/deduped.mp4` as the video for all subsequent steps. If reduction is minimal (<10%), the video has little static content — use the original. Report the reduction to the user.
+Review the output: if reduction is significant (>10%), use `$WORK_DIR/deduped.mp4` as the video for all subsequent steps. If reduction is minimal (<10%), the video has little static content — use the normalized video. Report the reduction and threshold used to the user.
 
-**Step 3: Generate contact sheet overview**
+If timestamps were burned in during normalization, the agent can see original timing in each frame (e.g., a jump from 0:01.200 to 0:02.800 means 1.6s of no visual change).
+
+**Step 4: Generate contact sheet overview**
 
 ```bash
 bash "$SCRIPTS_DIR/contact-sheet.sh" "<video-path>" "$WORK_DIR/contact-sheet.png" 5 5
 ```
 
-Use the deduped video path if dedup was applied.
+Use the deduped or normalized video path from previous steps.
 
-**Step 4: Read the contact sheet**
+**Step 5: Read the contact sheet**
 
 Use the Read tool to view `$WORK_DIR/contact-sheet.png`. This gives you a quick visual overview of the entire video.
 
-**Step 5: Route to workflow**
+**Step 6: Route to workflow**
 
 Based on the user's request AND what you see in the contact sheet, route to the appropriate workflow.
 </universal_pipeline>
@@ -107,7 +129,7 @@ Parse `$ARGUMENTS` for a video path, analysis instructions, and flags. Read `ref
    - **If prompt is ambiguous** (keywords don't clearly match the routing table): Use Template 3 (Analysis type selection).
 4. **If video is >30s:** Use Template 6 (Long video scope) to ask about trimming.
 5. **If animation analysis is selected and video >3s or no fps hint:** Use Template 4 (FPS selection).
-6. **If workflow review is selected:** Use Template 7 (Extraction strategy).
+6. **If workflow review is selected:** Use Template 8 (Animation sensitivity) to determine dedup threshold, then Template 7 (Extraction strategy).
 7. **If all arguments are present and clear:** Proceed directly to the universal pipeline.
 </intake>
 
@@ -137,6 +159,7 @@ All scripts in `$SCRIPTS_DIR` (`${CLAUDE_PLUGIN_ROOT}/skills/vision-replay/scrip
 | Script | Purpose | Key Args |
 |--------|---------|----------|
 | video-info.sh | Get video metadata | `<video-path>` |
+| normalize-video.sh | Downscale + timestamp overlay | `<input-video> <output-video> [max-dimension]` |
 | dedupe-video.sh | Remove static/unchanged frames from video | `<input-video> <output-video> [threshold]` |
 | extract-frames.sh | Extract frames at configurable fps | `<video> <out-dir> <fps> [start] [duration] [crop] [scale]` |
 | extract-progressive.sh | Lighthouse-style progressive intervals | `<video> <out-dir>` |
