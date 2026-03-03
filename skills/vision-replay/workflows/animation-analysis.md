@@ -27,7 +27,7 @@ Based on the contact sheet and the user's analysis request:
 
 **Step 3: Extract targeted frames**
 
-Run: `scripts/extract-frames.sh <video> <output-dir> <fps> [start] [duration] [crop]`
+Run: `bash "$SCRIPTS_DIR/extract-frames.sh" <video> <output-dir> <fps> [start] [duration] [crop]`
 
 Consider using:
 - Time range args to focus on the animation portion only
@@ -37,7 +37,7 @@ Consider using:
 **Step 4: Batch if needed**
 
 If more than 20 frames were extracted:
-Run: `scripts/batch-frames.sh <frames-dir> 15`
+Run: `bash "$SCRIPTS_DIR/batch-frames.sh" <frames-dir> 15`
 
 Read batches sequentially. Maintain analysis continuity across batches.
 
@@ -55,7 +55,7 @@ For each frame (or batch of frames), examine:
 
 If the user provided a reference video and an implementation video:
 1. Extract frames from both at the same fps
-2. Run: `scripts/diff-frames.sh <ref-dir> <impl-dir> <diff-dir>`
+2. Run: `bash "$SCRIPTS_DIR/diff-frames.sh" <ref-dir> <impl-dir> <diff-dir>`
 3. Read the diff frames -- each shows reference on left, implementation on right
 4. Note per-frame differences in timing, position, easing, color
 
@@ -70,7 +70,7 @@ Follow the structure in examples/animation-report.md:
 
 **Step 8: Clean up**
 
-Run: `scripts/cleanup.sh <frames-dir>`
+Run: `bash "$SCRIPTS_DIR/cleanup.sh" <frames-dir>`
 </process>
 
 <success_criteria>

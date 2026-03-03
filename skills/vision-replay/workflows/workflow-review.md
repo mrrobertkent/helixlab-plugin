@@ -20,10 +20,10 @@ The universal pipeline has already generated a contact sheet. Review it to under
 Choose the extraction strategy:
 
 **For linear workflows (form filling, wizard steps):**
-Run: `scripts/extract-frames.sh <video> <output-dir> 2`
+Run: `bash "$SCRIPTS_DIR/extract-frames.sh" <video> <output-dir> 2`
 
 **For mixed interactions (some pauses, some rapid clicks):**
-Run: `scripts/extract-frames.sh <video> <output-dir> 0 --scene-detect`
+Run: `bash "$SCRIPTS_DIR/extract-frames.sh" <video> <output-dir> 0 --scene-detect`
 
 Scene detection avoids extracting identical frames during pauses and captures state transitions automatically.
 
@@ -69,7 +69,7 @@ Follow the structure in examples/workflow-report.md:
 
 **Step 7: Clean up**
 
-Run: `scripts/cleanup.sh <frames-dir>`
+Run: `bash "$SCRIPTS_DIR/cleanup.sh" <frames-dir>`
 </process>
 
 <success_criteria>

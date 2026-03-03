@@ -17,7 +17,7 @@ The universal pipeline has already generated a contact sheet. Review it to under
 
 **Step 2: Extract progressive frames**
 
-Run: `scripts/extract-progressive.sh <video> <output-dir>`
+Run: `bash "$SCRIPTS_DIR/extract-progressive.sh" <video> <output-dir>`
 
 This captures at Lighthouse-style intervals:
 - 0-500ms: every 100ms (catches first paint, FCP)
@@ -63,7 +63,7 @@ Report structure:
 
 **Step 6: Clean up**
 
-Run: `scripts/cleanup.sh <frames-dir>`
+Run: `bash "$SCRIPTS_DIR/cleanup.sh" <frames-dir>`
 </process>
 
 <success_criteria>
