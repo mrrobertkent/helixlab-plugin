@@ -70,7 +70,7 @@ fi
 
 # Check if drawtext filter is available (requires libfreetype)
 HAS_DRAWTEXT=false
-if ffmpeg -filters 2>/dev/null | grep -q "drawtext"; then
+if ffmpeg -filters 2>/dev/null | grep "drawtext" > /dev/null; then
   HAS_DRAWTEXT=true
 fi
 

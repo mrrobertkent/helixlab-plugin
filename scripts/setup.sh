@@ -161,7 +161,7 @@ if [[ ${#MISSING[@]} -eq 0 ]]; then
 
   # Check for drawtext filter (required for timestamp overlays)
   echo -e "\n${CYAN}Optional Features${NC}"
-  if ffmpeg -filters 2>/dev/null | grep -q "drawtext"; then
+  if ffmpeg -filters 2>/dev/null | grep "drawtext" > /dev/null; then
     ok "drawtext filter available (timestamp overlay enabled)"
   else
     warn "drawtext filter missing (timestamp overlay disabled)"

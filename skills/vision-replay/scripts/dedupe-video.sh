@@ -99,7 +99,7 @@ fi
 FILTER_CHAIN="fps=120,mpdecimate=hi=$HI:lo=$LO:frac=$FRAC,setpts=N/FRAME_RATE/TB"
 
 # Check if drawtext is available for the deduped timestamp overlay
-if ffmpeg -filters 2>/dev/null | grep -q "drawtext"; then
+if ffmpeg -filters 2>/dev/null | grep "drawtext" > /dev/null; then
   # Get output width for font size calculation (use input width as proxy)
   INPUT_WIDTH=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$INPUT" 2>/dev/null || echo "1920")
   FONTSIZE=$(echo "$INPUT_WIDTH * 28 / 1920" | bc 2>/dev/null || echo "24")

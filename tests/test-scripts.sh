@@ -95,7 +95,7 @@ if [[ "$CHECK_FFMPEG" == true ]]; then
   fi
 
   # drawtext filter for timestamp overlay
-  if ffmpeg -filters 2>/dev/null | grep -q "drawtext"; then
+  if ffmpeg -filters 2>/dev/null | grep "drawtext" > /dev/null; then
     pass "drawtext filter available (timestamp overlay enabled)"
   else
     echo "  WARN: drawtext filter missing — timestamp overlays will be disabled"
