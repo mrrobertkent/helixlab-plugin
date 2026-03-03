@@ -28,6 +28,7 @@ fail() {
 
 SCRIPTS=(
   "video-info.sh"
+  "dedupe-video.sh"
   "extract-frames.sh"
   "extract-progressive.sh"
   "contact-sheet.sh"

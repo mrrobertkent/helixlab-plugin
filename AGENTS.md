@@ -45,7 +45,15 @@ bash skills/vision-replay/scripts/video-info.sh "<video-path>"
 
 Returns: duration, fps, resolution, codec, frame count, VFR detection.
 
-**Step 2: Generate contact sheet overview**
+**Step 2: Remove static/unchanged frames (optional but recommended)**
+
+```bash
+bash skills/vision-replay/scripts/dedupe-video.sh "<video-path>" "$WORK_DIR/deduped.mp4"
+```
+
+Removes frames with no visual change, producing a shorter video. Use the deduped video for all subsequent steps if reduction is significant (>10%). Reports original duration, deduped duration, and reduction percentage.
+
+**Step 3: Generate contact sheet overview**
 
 ```bash
 WORK_DIR="/tmp/claude-video-frames/$(date +%s)"
@@ -55,7 +63,7 @@ bash skills/vision-replay/scripts/contact-sheet.sh "<video-path>" "$WORK_DIR/con
 
 View the contact sheet to understand what's in the video.
 
-**Step 3: Extract frames based on analysis type**
+**Step 4: Extract frames based on analysis type**
 
 For animation analysis (configurable fps):
 ```bash
@@ -74,20 +82,20 @@ bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/fr
 bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 0 --scene-detect
 ```
 
-**Step 4: Batch frames if needed (>20 frames)**
+**Step 5: Batch frames if needed (>20 frames)**
 
 ```bash
 bash skills/vision-replay/scripts/batch-frames.sh "$WORK_DIR/frames" 15
 ```
 
-**Step 5: Analyze frames visually**
+**Step 6: Analyze frames visually**
 
 Read the extracted PNG frames and analyze them based on the workflow type. See workflow guides:
 - `skills/vision-replay/workflows/animation-analysis.md`
 - `skills/vision-replay/workflows/page-load-analysis.md`
 - `skills/vision-replay/workflows/workflow-review.md`
 
-**Step 6: Clean up**
+**Step 7: Clean up**
 
 ```bash
 bash skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
@@ -98,6 +106,7 @@ bash skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `video-info.sh` | Video metadata | `<video-path>` |
+| `dedupe-video.sh` | Remove static/unchanged frames | `<input-video> <output-video> [threshold]` |
 | `extract-frames.sh` | Extract at configurable fps | `<video> <out-dir> <fps> [start] [duration] [crop] [scale]` |
 | `extract-progressive.sh` | Lighthouse-style intervals | `<video> <out-dir>` |
 | `contact-sheet.sh` | Grid overview image | `<video> <out-path> [fps] [cols]` |
