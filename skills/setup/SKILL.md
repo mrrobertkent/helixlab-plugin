@@ -46,5 +46,6 @@ Summarize for the user:
 - Which dependencies are installed (with versions)
 - Which AI agent was detected and how to integrate
 - Any remaining action items
+- For Claude Code users: remind them to enable auto-update via `/plugin` → Marketplaces tab → select the helixlab marketplace → Enable auto-update (third-party marketplaces have auto-update disabled by default)
 
 </workflow>
