@@ -23,7 +23,7 @@ Choose the extraction strategy:
 Run: `bash "$SCRIPTS_DIR/extract-frames.sh" <video> <output-dir> 2`
 
 **For mixed interactions (some pauses, some rapid clicks):**
-Run: `bash "$SCRIPTS_DIR/extract-frames.sh" <video> <output-dir> 0 --scene-detect`
+Run: `bash "$SCRIPTS_DIR/extract-frames.sh" <video> <output-dir> --scene-detect`
 
 Scene detection avoids extracting identical frames during pauses and captures state transitions automatically.
 
@@ -33,7 +33,7 @@ Read frames in order. For each frame, identify:
 - **Current page/view**: What screen is the user on?
 - **UI state**: What is the state of interactive elements (buttons, forms, modals)?
 - **Cursor position**: Where is the cursor? What is the user about to interact with?
-- **Annotations**: Did the user circle something, draw an arrow, or highlight an area?
+- **Annotations**: Look for bright colored overlays — red, yellow, blue, or green circles, arrows, rectangles, freehand lines, or text drawn by the user during recording. These indicate areas the user wants you to focus on
 - **State transition**: What changed from the previous frame? What action caused it?
 
 **Step 4: Build the step map**
@@ -55,7 +55,7 @@ Look for:
 - **Confusing navigation**: Cursor wandering, looking for buttons
 - **Unexpected states**: Error messages, broken layouts, missing content
 - **Long waits**: Multiple frames with a loading spinner (time the gap)
-- **Highlighted areas**: If the user annotated the screen, focus analysis there
+- **Annotated areas**: If the user drew annotations (bright colored shapes or text), prioritize analysis of those regions and explain what you observe at each annotated location
 - **Missing states**: Steps that should exist but aren't captured (e.g., no confirmation before destructive action)
 
 **Step 6: Write the report**

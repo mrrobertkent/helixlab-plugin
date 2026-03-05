@@ -25,6 +25,12 @@
 
 set -euo pipefail
 
+command -v bc >/dev/null 2>&1 || { echo "Error: bc is required but not installed" >&2; exit 1; }
+
+# Suppress fontconfig warnings from static ffmpeg builds
+_FC="$(cd "$(dirname "$0")/../config" 2>/dev/null && pwd)/fonts.conf"
+[[ -f "$_FC" ]] && export FONTCONFIG_FILE="$_FC"
+
 INPUT="${1:-}"
 OUTPUT="${2:-}"
 THRESHOLD="${3:-5}"

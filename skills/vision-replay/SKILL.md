@@ -3,15 +3,15 @@ name: vision-replay
 description: >
   Extract frames from video files using ffmpeg and analyze them with Claude's
   multimodal vision. Supports animation timing analysis, page load performance
-  review, and user workflow progression. Use when working with video files,
-  screen recordings, animation validation, or visual analysis of UI behavior.
-argument-hint: "path/to/video.mp4 [analysis instructions]"
+  review, and user workflow progression. Automatically detects annotations drawn
+  with the record-browser skill. Use when working with video files, screen
+  recordings, animation validation, or visual analysis of UI behavior.
+argument-hint: "path/to/video.webm [analysis instructions]"
 allowed-tools:
   - Bash
   - Read
   - Glob
   - Grep
-  - AskUserQuestion
 ---
 
 <essential_principles>
@@ -19,26 +19,11 @@ allowed-tools:
 
 All frame extraction is handled by deterministic shell scripts. Workflows guide your analytical reasoning -- what to look for and how to structure findings. Scripts handle the mechanics.
 
-**Script location:** All scripts live at `${CLAUDE_PLUGIN_ROOT}/skills/vision-replay/scripts/`. Define this once at the start of every analysis:
+**Frame storage:** All frames go to `/tmp/claude-video-frames/<timestamp>/`. Always clean up after analysis using `cleanup.sh`.
 
-```bash
-SCRIPTS_DIR="${CLAUDE_PLUGIN_ROOT}/skills/vision-replay/scripts"
-```
+**Context window management:** Read at most 15-20 frames per batch. Use `batch-frames.sh` to organize large frame sets. Use `contact-sheet.sh` for quick overviews before detailed extraction.
 
-Then run scripts as: `bash "$SCRIPTS_DIR/<script-name>.sh" <args>`
-
-**Universal first-pass:** Every analysis starts with:
-1. Validate prerequisites (ffmpeg installed, file exists, valid video)
-2. Run `$SCRIPTS_DIR/video-info.sh` to get metadata
-3. Normalize the video with `$SCRIPTS_DIR/normalize-video.sh` (downscale + timestamp overlay)
-4. Deduplicate static frames with `$SCRIPTS_DIR/dedupe-video.sh` (skip if `--pre-deduped` flag is present)
-5. Run `$SCRIPTS_DIR/contact-sheet.sh` to generate a low-fps overview grid
-6. Review the contact sheet to confirm/adjust extraction strategy
-7. Then route to the appropriate workflow for targeted extraction and analysis
-
-**Frame storage:** All frames go to `/tmp/claude-video-frames/<timestamp>/`. Always clean up after analysis using `$SCRIPTS_DIR/cleanup.sh`.
-
-**Context window management:** Read at most 15-20 frames per batch. Use `$SCRIPTS_DIR/batch-frames.sh` to organize large frame sets. Use `$SCRIPTS_DIR/contact-sheet.sh` for quick overviews before detailed extraction.
+Works seamlessly with recordings from the record-browser skill — annotations drawn during recording appear as bright colored shapes in the extracted frames and are automatically prioritized during analysis.
 </essential_principles>
 
 <prerequisites>
@@ -100,10 +85,10 @@ If timestamps were burned in during normalization, the agent can see original ti
 **Step 4: Generate contact sheet overview**
 
 ```bash
-bash "$SCRIPTS_DIR/contact-sheet.sh" "<video-path>" "$WORK_DIR/contact-sheet.png" 5 5
+bash "$SCRIPTS_DIR/contact-sheet.sh" "$WORK_DIR/deduped.mp4" "$WORK_DIR/contact-sheet.png" 5 5
 ```
 
-Use the deduped or normalized video path from previous steps.
+Use `$WORK_DIR/deduped.mp4` if dedup was applied, or `$WORK_DIR/normalized.mp4` if dedup was skipped.
 
 **Step 5: Read the contact sheet**
 
@@ -115,7 +100,7 @@ Based on the user's request AND what you see in the contact sheet, route to the 
 </universal_pipeline>
 
 <intake>
-Parse `$ARGUMENTS` for a video path, analysis instructions, and flags. Read `references/question-templates.md` at intake time and use its JSON structures as-is, filling in any `{placeholder}` values from runtime context (video-info.sh output, glob results, etc.).
+Parse `$ARGUMENTS` for a video path, analysis instructions, and flags. Read `${CLAUDE_PLUGIN_ROOT}/skills/vision-replay/references/question-templates.md` at intake time and use its JSON structures as-is, filling in any `{placeholder}` values from runtime context (video-info.sh output, glob results, etc.).
 
 **Recognized flags:**
 - `--pre-deduped` — The video has already had static frames removed (e.g., by the record-browser skill). Skip the deduplication step in the universal pipeline.
@@ -131,7 +116,20 @@ Parse `$ARGUMENTS` for a video path, analysis instructions, and flags. Read `ref
 5. **If animation analysis is selected and video >3s or no fps hint:** Use Template 4 (FPS selection).
 6. **If workflow review is selected:** Use Template 8 (Animation sensitivity) to determine dedup threshold, then Template 7 (Extraction strategy).
 7. **If all arguments are present and clear:** Proceed directly to the universal pipeline.
+
+**AskUserQuestion timeout handling:** If the user does not respond to a question within a reasonable time, do not auto-answer or assume defaults. Wait for the user's explicit response before proceeding. If the AskUserQuestion call fails or returns an error, fall back to using the most conservative default (e.g., animation analysis at 10fps, full video scope) and inform the user which defaults were applied.
 </intake>
+
+<entry_points>
+**Standalone invocation:** User runs `/helixlab:vision-replay <video-path> [analysis instructions]`. Parse `$ARGUMENTS` for the video path and any analysis prompt, then proceed through the intake gate above.
+
+**Chained entry from record-browser:** When the record-browser skill saves a recording, it prints `HELIX_SAVED=<path>` to stdout. The record-browser skill may then invoke vision-replay with that path and a `--pre-deduped` flag. In this case, skip the deduplication step in the universal pipeline and proceed directly with the provided path.
+
+**Exit points:**
+- **Analysis complete:** The structured report has been delivered and frames cleaned up. This is the normal exit.
+- **User cancels:** The user decides not to proceed at any intake gate question. Acknowledge and stop.
+- **Error occurs:** A prerequisite is missing (ffmpeg not installed), the video file is invalid, or a script fails. Report the error clearly and suggest recovery steps. See `examples/error-handling.md` for common error scenarios and recovery actions.
+</entry_points>
 
 <routing>
 | Keywords / Context | Workflow |
@@ -146,9 +144,12 @@ Parse `$ARGUMENTS` for a video path, analysis instructions, and flags. Read `ref
 |----------------------------------------------------|--------------------------------------|
 | workflow, journey, user story, walkthrough, steps, | workflows/workflow-review.md |
 | click-through, progression, flow, UX review, | |
-| cursor, annotations, modal, navigation | |
+| cursor, annotations, modal, navigation, annotated, | |
+| record-browser, circled, highlighted, drawn | |
 |----------------------------------------------------|--------------------------------------|
 | general / ambiguous (no clear type detected) | workflows/animation-analysis.md |
+
+**Annotated recordings:** If the video was recorded with the record-browser skill and contains annotations (bright colored circles, arrows, rectangles, or text), default to **workflow review** mode. The annotation colors (red, yellow, blue, green) are highly visible in extracted frames and all analysis workflows are annotation-aware.
 
 **After reading the workflow, follow it exactly.**
 </routing>
@@ -167,6 +168,8 @@ All scripts in `$SCRIPTS_DIR` (`${CLAUDE_PLUGIN_ROOT}/skills/vision-replay/scrip
 | batch-frames.sh | Split frames into read-ready batches | `<frames-dir> [batch-size]` |
 | diff-frames.sh | Side-by-side comparison composites | `<ref-dir> <impl-dir> <out-dir>` |
 | cleanup.sh | Safe removal of frame directories | `<frames-dir>` |
+
+**Config:** `config/fonts.conf` is set via `FONTCONFIG_FILE` by scripts that use ffmpeg drawtext. It provides font paths for static ffmpeg builds on macOS/Linux. No action needed — scripts handle this automatically.
 
 All scripts use `set -euo pipefail` and validate inputs. Run via: `bash "$SCRIPTS_DIR/<name>.sh"`
 </scripts_index>
@@ -191,7 +194,9 @@ All domain knowledge in `references/`:
 Example output formats in `examples/`:
 
 **Animation:** examples/animation-report.md -- Frame table, issues, recommendations
+**Page load:** examples/page-load-report.md -- Timeline, key metrics, layout shifts, recommendations
 **Workflow:** examples/workflow-report.md -- Step map, observations, UX findings
+**Error handling:** examples/error-handling.md -- Common error scenarios, user messaging, and recovery actions
 </examples_index>
 
 <success_criteria>

@@ -35,6 +35,7 @@ Read frames in chronological order. For each frame, identify:
 - **Layout shifts**: Content moves position between frames (elements pushing each other around)
 - **Visual completeness**: All above-fold content is rendered
 - **Late-loading elements**: Content that appears after the initial render (lazy images, below-fold content, third-party widgets)
+- **Annotations**: Look for bright colored overlays (red, yellow, blue, green circles, arrows, rectangles, or text) drawn by the user during recording. These highlight areas of concern — prioritize analysis of annotated regions
 
 **Step 4: Timeline construction**
 
@@ -54,11 +55,12 @@ Build a timeline from the frame observations:
 
 **Step 5: Write the report**
 
-Report structure:
+Follow the structure in examples/page-load-report.md:
 - Metadata (video info, extraction intervals)
 - Timeline (chronological rendering events)
 - Key metrics (estimated FP, FCP, LCP, visual completeness timestamps)
 - Layout shift events (which elements, magnitude, timing)
+- Annotated areas (if present, what the user highlighted and analysis of those regions)
 - Recommendations (what to optimize, critical rendering path suggestions)
 
 **Step 6: Clean up**

@@ -8,6 +8,10 @@
 
 set -euo pipefail
 
+# Suppress fontconfig warnings from static ffmpeg builds
+_FC="$(cd "$(dirname "$0")/../config" 2>/dev/null && pwd)/fonts.conf"
+[[ -f "$_FC" ]] && export FONTCONFIG_FILE="$_FC"
+
 # Parse flags
 SCENE_DETECT=false
 ARGS=()
