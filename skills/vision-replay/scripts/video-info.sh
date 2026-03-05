@@ -6,6 +6,8 @@
 
 set -euo pipefail
 
+command -v bc >/dev/null 2>&1 || { echo "Error: bc is required but not installed" >&2; exit 1; }
+
 VIDEO_PATH="${1:-}"
 
 if [[ -z "$VIDEO_PATH" ]]; then

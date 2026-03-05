@@ -50,6 +50,7 @@ For each frame (or batch of frames), examine:
 - **Transform**: Scale, rotation, skew values
 - **Timing**: Frame spacing (are frame-to-frame deltas consistent with the easing curve?)
 - **Drops**: Are any frames identical to the previous? (indicates dropped frame)
+- **Annotations**: Look for bright colored overlays (red, yellow, blue, green circles, arrows, rectangles, or text). If present, the user drew these during recording to highlight specific elements — focus your analysis on annotated areas first
 
 **Step 6: Comparison mode (if two videos)**
 
@@ -66,6 +67,7 @@ Follow the structure in examples/animation-report.md:
 - Summary (1-2 paragraph overview of findings)
 - Frame analysis table (key frames with observations)
 - Issues found (with frame references)
+- Annotated areas (if annotations present, what the user highlighted and findings for those areas)
 - Recommendations
 
 **Step 8: Clean up**

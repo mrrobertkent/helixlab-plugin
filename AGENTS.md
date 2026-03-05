@@ -98,7 +98,7 @@ For workflow review (low fps or scene detection):
 ```bash
 bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 2
 # OR with scene detection:
-bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 0 --scene-detect
+bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" --scene-detect
 ```
 
 **Step 6: Batch frames if needed (>20 frames)**
@@ -139,4 +139,68 @@ bash skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
 - `skills/vision-replay/references/fps-strategy.md` — When to use 5, 10, 30, or 60 fps
 - `skills/vision-replay/references/ffmpeg-recipes.md` — Common ffmpeg filter chains
 - `skills/vision-replay/examples/animation-report.md` — Example animation analysis report
+- `skills/vision-replay/examples/page-load-report.md` — Example page load analysis report
 - `skills/vision-replay/examples/workflow-report.md` — Example workflow review report
+- `skills/vision-replay/examples/error-handling.md` — Common error scenarios and recovery actions
+
+### Record Browser — Browser Recording with Annotations
+
+Launch a headed Chrome browser with built-in recording controls and annotation tools. Record user workflows, draw annotations (lines, arrows, rectangles, circles, freehand, text) directly on the page using fabric.js, and save WebM recordings for AI analysis.
+
+**Requirements:** Node.js 22+ (uses built-in WebSocket for raw CDP — no npm packages needed).
+
+**Step 1: Launch recorder**
+
+Do NOT check for dependencies manually. Just run the launch script — it validates Chrome internally and exits with a clear error if missing.
+
+```bash
+SCRIPTS_DIR="${CLAUDE_PLUGIN_ROOT}/skills/record-browser/scripts"
+bash "$SCRIPTS_DIR/launch-recorder.sh" "[url]"
+```
+
+If it fails with "Chrome for Testing not installed":
+```bash
+bash "$SCRIPTS_DIR/install-browser.sh"
+bash "$SCRIPTS_DIR/launch-recorder.sh" "[url]"
+```
+
+**Step 2: Record and annotate**
+
+The browser opens with a glassmorphism toolbar. Use the toolbar or keyboard shortcuts:
+
+| Action | Toolbar | Shortcut |
+|--------|---------|----------|
+| Start recording | Click Record | |
+| Record on action | Click On Action | |
+| Pause / Resume | Click pause button | Space |
+| Stop | Click stop button | |
+| Restart | Click restart button | |
+| Toggle draw mode | Click Draw | D |
+| Exit draw mode | | Escape |
+| Undo annotation | Click undo | Ctrl/Cmd+Z |
+| Clear annotations (draw mode) | Click clear | C |
+| Switch color | Click color dot | 1-4 |
+| Delete selected | Click trash | Delete/Backspace |
+
+**Annotation tools (in draw mode):** Select, Pen, Line (with arrowhead options), Rectangle, Circle, Text. Additional controls: 4 stroke widths, fill toggle, 5 color presets (red, yellow, blue, green, white).
+
+**Step 3: Save via post-recording dialog**
+
+When you stop, a dialog appears with video playback, editable filename, and buttons: Save & Close, Start Over, Close.
+
+**Step 4: Parse session outcome from stdout**
+
+- `HELIX_SAVED=<path>` — user saved the recording. Continue to Step 5.
+- `HELIX_NO_SAVE` — user closed without saving. Acknowledge and stop.
+- `HELIX_SESSION_END` alone — browser was closed directly. Acknowledge and stop.
+
+**Step 5: Ask user what to do next (MANDATORY — wait for response)**
+
+Print the saved file path FIRST, then call AskUserQuestion using **Template 1** from `skills/record-browser/references/question-templates.md`. Do NOT auto-answer.
+
+- "Keep as artifact" → report path and stop.
+- "Analyze with Vision Replay" → ask **Template 2** (preparation method), then **Template 3** (analysis mode), then run the vision-replay pipeline.
+
+**Step 6: Post-analysis cleanup (MANDATORY — wait for response)**
+
+Call AskUserQuestion using **Template 4** from the same file. Only delete if user chooses "Delete recording".

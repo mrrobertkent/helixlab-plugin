@@ -174,6 +174,83 @@ bash skills/vision-replay/scripts/cleanup.sh /tmp/frames
 
 </details>
 
+### Record Browser
+
+Launch a headed Chrome browser with built-in recording and annotation tools. Navigate manually while recording, draw annotations directly on the page, and save WebM recordings for AI analysis.
+
+> [!NOTE]
+> Record Browser requires **Node.js 22+**. The install script downloads a self-contained Chrome for Testing binary — no npm packages or global browser install needed.
+
+**Features:**
+
+| Feature | Description |
+|---------|-------------|
+| Glassmorphism toolbar | Record, On Action, pause/stop, restart |
+| 6 drawing tools | Select, Pen, Line, Rectangle, Circle, Text (via fabric.js) |
+| Lines & arrows | Plain line, arrow at end, arrow at start, double arrow |
+| 5 color presets | Red, yellow, blue, green, white — optimized for AI vision |
+| Stroke & fill | 4 stroke widths (1/2/3/5px), semi-transparent fill toggle for shapes |
+| Text formatting | 4 sizes (S/M/L/XL), background toggle (BG), border toggle (BD) |
+| Keyboard shortcuts | Space, D, Esc, Ctrl+Z, C, 1-4, Delete, Shift (constrain), ⌘/Ctrl+Click (multi-select) |
+| Post-recording dialog | Video playback, expand overlay, rename, save & close |
+| Welcome page | Launches when no URL provided — includes full tool reference |
+
+**How it works with Vision Replay:**
+
+Record Browser captures annotated recordings. Vision Replay analyzes them. The two skills chain together:
+
+1. **Record:** `/helixlab:record-browser` → navigate, annotate, save & close
+2. **Analyze:** `/helixlab:vision-replay <saved-recording.webm>` → the agent sees your annotations as bright colored shapes in the extracted frames and focuses analysis on those areas
+
+<details>
+<summary><strong>Quick start</strong></summary>
+
+```bash
+# Install browser dependencies (one-time — downloads Chrome for Testing)
+bash skills/record-browser/scripts/install-browser.sh
+
+# Launch recorder (opens welcome page — navigate via address bar)
+bash skills/record-browser/scripts/launch-recorder.sh
+
+# Or launch directly at a URL
+bash skills/record-browser/scripts/launch-recorder.sh "https://example.com"
+
+# Use the in-browser toolbar to record, draw annotations, and save
+# HELIX_SAVED=<path> is printed to stdout when the user saves a recording
+```
+
+</details>
+
+<details>
+<summary><strong>Platform support</strong></summary>
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| macOS | Supported | Works out of the box |
+| Linux (X11/Wayland) | Supported | Requires a display server |
+| Windows (WSL2 + WSLg) | Supported | Windows 11 with WSLg provides GUI support automatically |
+| Windows (WSL2, older) | Requires setup | Install an X server (VcXsrv, X410) and set `DISPLAY` |
+
+Record Browser launches a **headed** (visible) Chrome window — it cannot run headless since the user needs to interact with the browser to navigate and annotate.
+
+</details>
+
+<details>
+<summary><strong>Troubleshooting</strong></summary>
+
+| Issue | Solution |
+|-------|----------|
+| `Chrome binary not found` | Run `bash skills/record-browser/scripts/install-browser.sh` |
+| `Node.js 22+ is required` | Install Node.js 22+ from [nodejs.org](https://nodejs.org) |
+| Chrome window doesn't appear (WSL2) | Install WSLg (Windows 11) or an X server and set `DISPLAY=:0` |
+| Blank recording | Ensure you clicked Record or On Action before interacting |
+| Annotations not visible in recording | Annotations are captured automatically — ensure Draw mode was active when drawing |
+
+</details>
+
+> [!NOTE]
+> **Known Issue:** Chrome for Testing v146 may show a "quit unexpectedly" dialog when the browser is closed. This is cosmetic and does not affect recording or video saving.
+
 ---
 
 ## Contributing

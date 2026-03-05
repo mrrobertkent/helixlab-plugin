@@ -232,6 +232,52 @@ else
 fi
 
 # ============================================================
+# Phase 1b: Record Browser Dependencies (optional)
+# ============================================================
+
+echo -e "\n${CYAN}Record Browser (optional)${NC}"
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+if command -v node &>/dev/null; then
+  NODE_VER=$(node --version)
+  ok "Node.js installed (${NODE_VER})"
+
+  if [[ -d "$PLUGIN_ROOT/.deps/node_modules/puppeteer-core" ]]; then
+    ok "puppeteer-core installed"
+  else
+    warn "puppeteer-core not installed"
+    info "Run: bash skills/record-browser/scripts/install-browser.sh"
+  fi
+
+  if [[ -f "$PLUGIN_ROOT/.deps/.chrome-path" ]]; then
+    CHROME_PATH=$(cat "$PLUGIN_ROOT/.deps/.chrome-path")
+    if [[ -f "$CHROME_PATH" ]]; then
+      ok "Chrome for Testing installed"
+    else
+      warn "Chrome binary missing at $CHROME_PATH"
+      info "Run: bash skills/record-browser/scripts/install-browser.sh"
+    fi
+  else
+    warn "Chrome for Testing not installed"
+    info "Run: bash skills/record-browser/scripts/install-browser.sh"
+  fi
+
+  OS=$(detect_os)
+  if [[ "$OS" == "wsl" ]]; then
+    echo ""
+    warn "WSL2 detected — headed Chrome requires a display server"
+    info "WSLg (Windows 11): Should work automatically"
+    info "Older Windows: Install an X server (VcXsrv, X410) and set DISPLAY"
+  fi
+else
+  warn "Node.js not installed — record-browser skill unavailable"
+  info "Install Node.js 18+ from https://nodejs.org"
+  info "record-browser requires Node.js for Puppeteer-based browser recording"
+fi
+
+# ============================================================
 # Phase 2: Agent Detection & Next Steps
 # ============================================================
 

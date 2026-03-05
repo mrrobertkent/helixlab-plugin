@@ -73,6 +73,69 @@ for script in "${SCRIPTS[@]}"; do
   fi
 done
 
+# --- Record Browser ---
+RB_DIR="$(cd "$(dirname "$0")/../skills/record-browser" && pwd)"
+
+echo ""
+echo "=== Record Browser Scripts ==="
+
+# recorder.js and cdp.js exist and have valid syntax
+for js_file in recorder.js cdp.js; do
+  if [[ -f "$RB_DIR/scripts/$js_file" ]]; then
+    pass "$js_file exists"
+  else
+    fail "$js_file NOT FOUND"
+  fi
+
+  if command -v node &>/dev/null && [[ -f "$RB_DIR/scripts/$js_file" ]]; then
+    if node --check "$RB_DIR/scripts/$js_file" 2>/dev/null; then
+      pass "$js_file syntax check"
+    else
+      fail "$js_file syntax error"
+    fi
+  fi
+done
+
+# Bash scripts exist and are executable
+for rb_script in install-browser.sh launch-recorder.sh stop-recorder.sh; do
+  if [[ -f "$RB_DIR/scripts/$rb_script" ]]; then
+    pass "$rb_script exists"
+  else
+    fail "$rb_script NOT FOUND"
+  fi
+  if [[ -x "$RB_DIR/scripts/$rb_script" ]]; then
+    pass "$rb_script is executable"
+  else
+    fail "$rb_script is NOT executable"
+  fi
+done
+
+# stop-recorder.sh fails with no active recording
+if bash "$RB_DIR/scripts/stop-recorder.sh" 2>/dev/null; then
+  fail "stop-recorder.sh should exit non-zero with no active recording"
+else
+  pass "stop-recorder.sh exits non-zero with no active recording"
+fi
+
+# Vendored assets exist
+if [[ -f "$RB_DIR/vendor/fabric.min.js" ]]; then
+  pass "vendor/fabric.min.js exists"
+else
+  fail "vendor/fabric.min.js NOT FOUND"
+fi
+
+if [[ -f "$RB_DIR/pages/welcome.html" ]]; then
+  pass "pages/welcome.html exists"
+else
+  fail "pages/welcome.html NOT FOUND"
+fi
+
+if [[ -f "$RB_DIR/pages/playground.html" ]]; then
+  pass "pages/playground.html exists"
+else
+  fail "pages/playground.html NOT FOUND"
+fi
+
 if [[ "$CHECK_FFMPEG" == true ]]; then
   echo ""
   echo "=== ffmpeg Availability ==="

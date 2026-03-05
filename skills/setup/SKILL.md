@@ -9,7 +9,10 @@ disable-model-invocation: true
 ---
 
 <essential_principles>
-The setup skill checks that HelixLab's system dependencies (ffmpeg, ffprobe, bc) are installed and guides the user through installation if anything is missing. It also detects the user's AI coding agent and provides tailored integration instructions.
+The setup skill checks that HelixLab's system dependencies are installed and guides the user through installation if anything is missing. It also detects the user's AI coding agent and provides tailored integration instructions.
+
+**Core dependencies** (required for vision-replay): ffmpeg, ffprobe, bc
+**Optional dependencies** (required for record-browser): Node.js 22+, Chrome for Testing
 
 This skill is idempotent — safe to run at any time.
 </essential_principles>
@@ -31,6 +34,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/scripts/setup.sh $ARGUMENTS
 Review the script output:
 - If all dependencies show ✓, report that HelixLab is ready
 - If any dependencies show ✗, help the user resolve them based on the script's recommendations
+- Check the "Record Browser" section — if Node.js 22+ is available but Chrome for Testing is missing, offer to run `install-browser.sh`
 
 **Step 3: Verify with tests**
 

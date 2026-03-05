@@ -24,4 +24,10 @@ The checkout flow has 5 distinct steps captured across 8 key frames. The user co
 - **Payment processing delay:** 3 seconds from submission to confirmation is noticeable. Consider adding a progress indicator or intermediate "Processing..." state with status updates.
 - **No error states captured:** The recording shows a happy path only. Consider recording error scenarios (invalid card, network timeout) for additional analysis.
 </observations>
+
+<recommendations>
+- Make the "Continue" button on the shipping form more prominent (larger, higher contrast) or move it to a more conventional position (bottom-right of the form)
+- Add a progress indicator during payment processing to manage user expectations during the 3-second wait
+- Consider recording error paths (invalid card, network timeout) to verify error handling UX
+</recommendations>
 </example_report>

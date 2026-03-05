@@ -6,6 +6,12 @@
 
 set -euo pipefail
 
+command -v bc >/dev/null 2>&1 || { echo "Error: bc is required but not installed" >&2; exit 1; }
+
+# Suppress fontconfig warnings from static ffmpeg builds
+_FC="$(cd "$(dirname "$0")/../config" 2>/dev/null && pwd)/fonts.conf"
+[[ -f "$_FC" ]] && export FONTCONFIG_FILE="$_FC"
+
 VIDEO_PATH="${1:-}"
 OUTPUT_PATH="${2:-}"
 FPS="${3:-5}"
@@ -24,6 +30,10 @@ fi
 
 # Get duration to calculate rows needed
 DURATION=$(ffprobe -v quiet -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$VIDEO_PATH" 2>/dev/null)
+if [[ -z "$DURATION" || "$DURATION" == "N/A" ]]; then
+  echo "Error: Could not determine video duration for: $VIDEO_PATH" >&2
+  exit 1
+fi
 TOTAL_FRAMES=$(echo "$DURATION * $FPS" | bc | cut -d'.' -f1)
 ROWS=$(( (TOTAL_FRAMES + TILE_COLS - 1) / TILE_COLS ))
 

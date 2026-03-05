@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HelixLab Recorder</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    background: linear-gradient(155deg, #1a0f0a 0%, #1c1118 30%, #151025 60%, #0f172a 100%); color: #e0e0e0; min-height: 100vh; width: 100%;
+  }
+
+  /* ===== WELCOME PAGE ===== */
+  #webpage-bg { position: relative; min-height: 100vh; z-index: 0; }
+  .welcome-glow { position: absolute; top: -120px; left: 50%; transform: translateX(-50%); width: 700px; height: 400px; background: radial-gradient(ellipse, rgba(249,115,22,0.12) 0%, rgba(139,92,246,0.06) 50%, transparent 70%); pointer-events: none; }
+  .welcome-inner { max-width: 720px; margin: 0 auto; padding: 60px 32px 180px; position: relative; }
+  .welcome-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 100px; background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2); margin-bottom: 24px; }
+  .welcome-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #f97316; }
+  .welcome-badge-text { font-size: 12px; font-weight: 600; color: #fb923c; letter-spacing: 0.5px; text-transform: uppercase; }
+  .welcome-title { font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 12px; background: linear-gradient(135deg, #fed7aa 0%, #f97316 40%, #ea580c 70%, #c2410c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .welcome-subtitle { font-size: 18px; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 48px; max-width: 520px; }
+  .welcome-section-label { font-size: 11px; font-weight: 700; color: rgba(249,115,22,0.6); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+  .welcome-steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+  .welcome-step { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); transition: background 0.2s, border-color 0.2s; }
+  .welcome-step:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+  .step-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+  .step-num-1 { background: linear-gradient(135deg, rgba(249,115,22,0.2), rgba(234,88,12,0.2)); color: #fb923c; }
+  .step-num-2 { background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(99,102,241,0.2)); color: #a78bfa; }
+  .step-num-3 { background: linear-gradient(135deg, rgba(249,115,22,0.15), rgba(139,92,246,0.15)); color: #fdba74; }
+  .step-num-4 { background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.15)); color: #818cf8; }
+  .step-num-5 { background: linear-gradient(135deg, rgba(234,88,12,0.2), rgba(249,115,22,0.1)); color: #f97316; }
+  .step-text { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.5; padding-top: 3px; }
+  .step-text strong { color: rgba(255,255,255,0.9); font-weight: 600; }
+  .welcome-note { padding: 16px 20px; border-radius: 14px; background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.12); margin-bottom: 48px; }
+  .welcome-note-title { font-size: 13px; font-weight: 700; color: #fb923c; margin-bottom: 8px; }
+  .welcome-note-text { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+  .welcome-shortcuts { margin-bottom: 48px; }
+  .shortcut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .shortcut-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.02); }
+  .shortcut-key { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 24px; padding: 0 8px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); font-family: 'SF Mono', Menlo, monospace; }
+  .shortcut-desc { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .welcome-footer { text-align: center; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .welcome-footer-text { font-size: 13px; color: rgba(255,255,255,0.25); }
+  .welcome-footer-url { display: inline-block; margin-top: 8px; padding: 8px 20px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); font-size: 13px; color: rgba(255,255,255,0.35); font-family: 'SF Mono', Menlo, monospace; }
+</style>
+</head>
+<body>
+
+<div id="webpage-bg">
+  <!-- Ambient glow -->
+  <div class="welcome-glow"></div>
+
+  <div class="welcome-inner">
+    <!-- Badge -->
+    <div class="welcome-badge">
+      <div class="welcome-badge-dot"></div>
+      <span class="welcome-badge-text">HelixLab Recorder</span>
+    </div>
+
+    <!-- Title + Subtitle -->
+    <h1 class="welcome-title">Ready to Capture</h1>
+    <p class="welcome-subtitle">Record user workflows, annotate key moments, and let your AI agent analyze the results. Navigate to any page using the address bar, then start recording.</p>
+
+    <!-- Quick Start Steps -->
+    <div class="welcome-section-label">Quick Start</div>
+    <div class="welcome-steps">
+      <div class="welcome-step">
+        <div class="step-num step-num-1">1</div>
+        <div class="step-text"><strong>Navigate</strong> to your target page using the browser address bar</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num step-num-2">2</div>
+        <div class="step-text"><strong>Record</strong> — click Record in the toolbar below, or On Action to start on your next click</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num step-num-3">3</div>
+        <div class="step-text"><strong>Annotate</strong> — press D or click Draw to circle, arrow, or label things for the AI to focus on</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num step-num-4">4</div>
+        <div class="step-text"><strong>Pause</strong> with Space to add annotations without them appearing mid-recording</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num step-num-5">5</div>
+        <div class="step-text"><strong>Stop</strong> when done — save, rename, or start over from the dialog</div>
+      </div>
+    </div>
+
+    <!-- Drawing Tools -->
+    <div class="welcome-section-label">Drawing Tools</div>
+    <div class="welcome-steps" style="margin-bottom: 32px;">
+      <div class="welcome-step">
+        <div class="step-num" style="background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(99,102,241,0.2)); color: #a78bfa;">✎</div>
+        <div class="step-text"><strong>6 tools:</strong> Select, Pen, Line, Rectangle, Circle, Text — click Draw or press D to enter draw mode</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num" style="background: linear-gradient(135deg, rgba(255,59,48,0.2), rgba(255,214,10,0.2)); color: #ff6b6b;">●</div>
+        <div class="step-text"><strong>5 colors:</strong> Red, Yellow, Blue, Green, White — press 1-4 to quick-switch, all optimized for AI visibility</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num" style="background: linear-gradient(135deg, rgba(0,122,255,0.2), rgba(99,102,241,0.2)); color: #007aff;">↗</div>
+        <div class="step-text"><strong>Lines &amp; Arrows:</strong> Plain line, arrow end, arrow start, or double arrow — select style before or after drawing</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num" style="background: linear-gradient(135deg, rgba(48,209,88,0.2), rgba(0,122,255,0.15)); color: #30d158;">▤</div>
+        <div class="step-text"><strong>Stroke &amp; Fill:</strong> 4 stroke widths (1/2/3/5px), toggle semi-transparent fill on shapes and text backgrounds</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num" style="background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(142,142,147,0.15)); color: #8e8e93;">T</div>
+        <div class="step-text"><strong>Text:</strong> 4 sizes (S/M/L/XL), background toggle (BG), border toggle (BD) — click to place, double-click to re-edit</div>
+      </div>
+    </div>
+
+    <!-- How Annotations Work note -->
+    <div class="welcome-note">
+      <div class="welcome-note-title">How Annotations Work</div>
+      <div class="welcome-note-text">Annotations are tied to the recording timeline. They appear in the video from the moment you draw them and stay visible until you move, resize, or delete them. Pause the recording to reposition annotations between scenes — the AI agent will see exactly what was on screen at each point in the recording.</div>
+    </div>
+
+    <!-- Keyboard Shortcuts -->
+    <div class="welcome-section-label">Keyboard Shortcuts</div>
+    <div class="shortcut-grid welcome-shortcuts">
+      <div class="shortcut-row">
+        <span class="shortcut-key">Space</span>
+        <span class="shortcut-desc">Pause / Resume</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">D</span>
+        <span class="shortcut-desc">Toggle draw mode</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">Esc</span>
+        <span class="shortcut-desc">Exit draw mode</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">⌘Z</span>
+        <span class="shortcut-desc">Undo annotation</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">C</span>
+        <span class="shortcut-desc">Clear annotations</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">1-4</span>
+        <span class="shortcut-desc">Quick-switch color</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">Del</span>
+        <span class="shortcut-desc">Delete selected</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">Shift / ⌘ / Ctrl</span>
+        <span class="shortcut-desc">Constrain to 1:1 ratio</span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-key">⌘/Ctrl+Click</span>
+        <span class="shortcut-desc">Multi-select annotations</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="welcome-footer">
+      <div class="welcome-footer-text">Navigate to any URL to begin recording</div>
+      <div class="welcome-footer-url">https://your-app.com</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

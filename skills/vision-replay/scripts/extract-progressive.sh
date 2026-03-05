@@ -7,6 +7,12 @@
 
 set -euo pipefail
 
+command -v bc >/dev/null 2>&1 || { echo "Error: bc is required but not installed" >&2; exit 1; }
+
+# Suppress fontconfig warnings from static ffmpeg builds
+_FC="$(cd "$(dirname "$0")/../config" 2>/dev/null && pwd)/fonts.conf"
+[[ -f "$_FC" ]] && export FONTCONFIG_FILE="$_FC"
+
 VIDEO_PATH="${1:-}"
 OUTPUT_DIR="${2:-}"
 
@@ -25,6 +31,10 @@ mkdir -p "$OUTPUT_DIR"
 
 # Get video duration in seconds
 DURATION=$(ffprobe -v quiet -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$VIDEO_PATH" 2>/dev/null)
+if [[ -z "$DURATION" || "$DURATION" == "N/A" ]]; then
+  echo "Error: Could not determine video duration for: $VIDEO_PATH" >&2
+  exit 1
+fi
 DURATION_MS=$(echo "$DURATION * 1000" | bc | cut -d'.' -f1)
 
 # Build timestamp list based on progressive intervals
@@ -73,9 +83,17 @@ SELECT_EXPR=$(IFS='|'; echo "${SELECT_PARTS[*]}")
 SELECT_FILTER="select='${SELECT_EXPR}'"
 
 # Extract all frames in a single decode pass
-ffmpeg -y -loglevel error -i "$VIDEO_PATH" \
+if ! ffmpeg -y -loglevel error -i "$VIDEO_PATH" \
   -vf "$SELECT_FILTER" -vsync vfr \
-  "$OUTPUT_DIR/frame_seq_%04d.png" 2>/dev/null || true
+  "$OUTPUT_DIR/frame_seq_%04d.png" 2>/dev/null; then
+  # Check if any frames were extracted despite the error
+  EXTRACTED=$(find "$OUTPUT_DIR" -maxdepth 1 -name "frame_seq_*" -type f 2>/dev/null | wc -l | tr -d ' ')
+  if [[ "$EXTRACTED" -eq 0 ]]; then
+    echo "Error: ffmpeg frame extraction failed — no frames produced" >&2
+    exit 2
+  fi
+  echo "Warning: ffmpeg exited with errors but extracted $EXTRACTED frames — continuing" >&2
+fi
 
 # Rename sequential frames to timestamp-based names
 SEQ_FRAMES=($(find "$OUTPUT_DIR" -maxdepth 1 -name "frame_seq_*" -type f | sort))
