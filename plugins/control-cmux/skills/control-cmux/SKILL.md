@@ -1,11 +1,11 @@
 ---
 name: control-cmux
 description: >-
-  Controls cmux terminal — opens browser surfaces, manages workspaces/panes/surfaces,
-  spawns Claude sessions in new tabs or splits, automates the cmux embedded browser,
-  and orchestrates agent teams natively in cmux. TRIGGER when: user mentions cmux,
-  browser testing in cmux, opening browser, spawning sessions, split panes, workspace
-  management, or agent teams in terminal. DO NOT TRIGGER when: general terminal
+  Controls cmux terminal and embedded browser — opens browser surfaces, manages
+  workspaces/panes/surfaces, spawns Claude sessions in new tabs or splits, automates
+  web pages, and orchestrates agent teams natively in cmux. Use when the user mentions
+  cmux, browser testing in cmux, opening browser, spawning sessions, split panes,
+  workspace management, or agent teams in terminal. Does not apply to general terminal
   commands, tmux operations, or browser automation outside cmux (Playwright, Puppeteer).
 ---
 
@@ -22,6 +22,15 @@ description: >-
 9. **Team orchestration is experimental** — file-based inbox works but is not battle-tested in cmux
 
 </essential_principles>
+
+<anti_patterns>
+
+- **Never target browser surface by index guess** — always `cmux browser identify` or check `cmux list-surfaces` first
+- **Never skip re-snapshot after DOM changes** — refs from previous snapshots are stale and will fail silently
+- **Never omit `--dangerously-skip-permissions` on spawned sessions** — they will hang waiting for user approval
+- **Never use raw UUIDs** — always use short refs like `surface:N`, `workspace:N`, `pane:N`
+
+</anti_patterns>
 
 <objective>
 Unified skill for controlling cmux terminal and embedded browser. Teaches agents how to
@@ -70,7 +79,7 @@ Wait for response or infer from context before proceeding.
 | 5, "team", "orchestrate"         | workflows/orchestrate-team.md     |
 | 6, "auth", "cookies", "state"    | workflows/manage-state.md         |
 | 7, "notify", "progress", "log"   | workflows/monitor-and-notify.md   |
-| 8, "error", "not working"        | references/troubleshooting.md     |
+| 8, "error", "not working"        | workflows/troubleshoot.md         |
 
 After reading the workflow, follow it exactly.
 
@@ -131,5 +140,7 @@ Run any script with `--help` for usage details.
 - Spawned sessions are running and responsive
 - No stale ref errors (re-snapshotted after DOM changes)
 - Team members (if used) are coordinating via inbox files
+
+Each workflow contains its own detailed completion checklist. The criteria above confirm the operation ran; workflow-level criteria confirm it ran correctly.
 
 </success_criteria>
