@@ -1,0 +1,9 @@
+{
+  "name": "control-cmux",
+  "description": "Unified skill for controlling cmux terminal and embedded browser — opens browser surfaces, manages workspaces/panes/surfaces, spawns Claude sessions, automates web pages, and orchestrates agent teams.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Robert Kent Jr."
+  },
+  "category": "development"
+}
