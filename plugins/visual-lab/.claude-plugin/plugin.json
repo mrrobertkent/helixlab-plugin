@@ -1,0 +1,10 @@
+{
+  "name": "visual-lab",
+  "description": "AI-powered visual analysis tools — extract video frames, record browser sessions, and analyze animations, loading performance, visual artifacts, and UX workflows for web and app development.",
+  "version": "2.0.0",
+  "author": {
+    "name": "Robert Kent Jr.",
+    "url": "https://helixlab.app"
+  },
+  "category": "development"
+}

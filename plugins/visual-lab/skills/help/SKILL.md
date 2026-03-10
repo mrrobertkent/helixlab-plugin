@@ -1,12 +1,13 @@
 ---
 name: help
-description: Show HelixLab plugin info, available skills, prerequisites, and version
+description: Show Visual Lab plugin info, available skills, prerequisites, and version
 disable-model-invocation: true
 ---
 
-# HelixLab — Developer Tools for AI Coding Agents
+# Visual Lab — AI-Powered Visual Analysis Tools
 
-**Version:** 1.2.0
+**Plugin:** visual-lab (part of the HelixLab marketplace)
+**Version:** 2.0.0
 **License:** MIT
 **Author:** Robert Kent Jr.
 **Homepage:** https://github.com/mrrobertkent/helixlab-plugin
