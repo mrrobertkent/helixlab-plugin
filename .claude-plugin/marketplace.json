@@ -1,16 +1,27 @@
 {
   "name": "helixlab",
-  "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
+  "description": "Developer tools and skills for AI-powered coding workflows — visual analysis, terminal control, and more.",
   "owner": {
     "name": "Robert Kent Jr.",
     "url": "https://helixlab.app"
   },
   "plugins": [
     {
-      "name": "helixlab",
-      "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
-      "version": "1.2.0",
-      "source": "./",
+      "name": "visual-lab",
+      "description": "AI-powered visual analysis tools — extract video frames, record browser sessions, and analyze animations, loading performance, visual artifacts, and UX workflows.",
+      "version": "2.0.0",
+      "source": "./plugins/visual-lab",
+      "author": {
+        "name": "Robert Kent Jr.",
+        "url": "https://helixlab.app"
+      },
+      "category": "development"
+    },
+    {
+      "name": "control-cmux",
+      "description": "Unified skill for controlling cmux terminal and embedded browser — opens browser surfaces, manages workspaces/panes/surfaces, spawns Claude sessions, automates web pages, and orchestrates agent teams.",
+      "version": "1.0.0",
+      "source": "./plugins/control-cmux",
       "author": {
         "name": "Robert Kent Jr.",
         "url": "https://helixlab.app"

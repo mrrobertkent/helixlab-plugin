@@ -1,13 +1,13 @@
 {
   "name": "helixlab",
-  "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
-  "version": "1.2.0",
+  "description": "Developer tools and skills for AI-powered coding workflows — visual analysis, terminal control, and more.",
+  "version": "2.0.0",
   "author": {
     "name": "Robert Kent Jr.",
     "url": "https://helixlab.app"
   },
-  "homepage": "https://github.com/mrrobertkent/helixlab-plugin",
-  "repository": "https://github.com/mrrobertkent/helixlab-plugin",
+  "homepage": "https://github.com/mrrobertkent/helixlab-marketplace",
+  "repository": "https://github.com/mrrobertkent/helixlab-marketplace",
   "license": "MIT",
-  "keywords": ["developer-tools", "video", "vision", "frames", "analysis", "ffmpeg", "ai-skills"]
+  "keywords": ["developer-tools", "video", "vision", "frames", "analysis", "ffmpeg", "ai-skills", "cmux", "terminal", "browser-automation"]
 }
