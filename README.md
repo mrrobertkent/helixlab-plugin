@@ -2,7 +2,9 @@
 
 > Open-source developer tools and skills for AI coding agents
 
-HelixLab is a marketplace of developer tool plugins that work with any AI coding agent. Each plugin is a self-contained collection of bash scripts and markdown workflow guides.
+HelixLab is an open-source marketplace of developer tool plugins for AI coding agents. Each plugin is self-contained with its own skills, scripts, and workflow guides — install only what you need.
+
+More plugins are actively in development. Watch the repo or check back for new additions.
 
 ---
 
@@ -77,7 +79,7 @@ Requires [cmux](https://cmux.dev) v0.62.0+ with the cmux CLI available in PATH.
 
 Add the marketplace and install individual plugins:
 ```
-/plugin marketplace add https://github.com/mrrobertkent/helixlab-plugin
+/plugin marketplace add https://github.com/mrrobertkent/helixlab-marketplace
 /plugin install visual-lab
 /plugin install control-cmux
 ```
@@ -142,8 +144,8 @@ All of these agents support the `AGENTS.md` standard. Clone or copy `AGENTS.md` 
 All scripts work standalone — no plugin system required:
 
 ```bash
-git clone https://github.com/mrrobertkent/helixlab-plugin.git
-bash helixlab-plugin/plugins/visual-lab/skills/vision-replay/scripts/video-info.sh /path/to/video.mp4
+git clone https://github.com/mrrobertkent/helixlab-marketplace.git
+bash helixlab-marketplace/plugins/visual-lab/skills/vision-replay/scripts/video-info.sh /path/to/video.mp4
 ```
 
 </details>
@@ -297,7 +299,7 @@ Unified skill for controlling cmux terminal and browser. See the [control-cmux p
 ## Project Structure
 
 ```
-helixlab-plugin/
+helixlab-marketplace/
   .claude-plugin/
     plugin.json              # Marketplace manifest
     marketplace.json         # Plugin catalog

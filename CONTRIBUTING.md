@@ -10,7 +10,7 @@ By participating in this project, you agree to treat all contributors with respe
 
 ### Reporting Bugs
 
-1. Check [existing issues](https://github.com/mrrobertkent/helixlab-plugin/issues) to avoid duplicates
+1. Check [existing issues](https://github.com/mrrobertkent/helixlab-marketplace/issues) to avoid duplicates
 2. Open a new issue with:
    - A clear, descriptive title
    - Steps to reproduce the problem
@@ -162,7 +162,7 @@ When adding new scripts, ensure they follow the same pattern: exist, are executa
 
 ## Questions?
 
-Open an issue or start a discussion on the [repository](https://github.com/mrrobertkent/helixlab-plugin).
+Open an issue or start a discussion on the [repository](https://github.com/mrrobertkent/helixlab-marketplace).
 
 ## License
 

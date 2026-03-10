@@ -10,7 +10,7 @@ disable-model-invocation: true
 **Version:** 2.0.0
 **License:** MIT
 **Author:** Robert Kent Jr.
-**Homepage:** https://github.com/mrrobertkent/helixlab-plugin
+**Homepage:** https://github.com/mrrobertkent/helixlab-marketplace
 
 ## Available Skills
 
