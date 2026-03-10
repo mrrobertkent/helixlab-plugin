@@ -78,13 +78,13 @@ After reading the workflow, follow it exactly.
 
 <script_index>
 
-| Script                  | Purpose                                              |
-|-------------------------|------------------------------------------------------|
-| cmux-env.sh             | Detect cmux context, validate socket, report status  |
-| cmux-spawn.sh           | Spawn session or browser in new surface/split        |
-| cmux-team-create.sh     | Create team surfaces + launch teammates with flags   |
-| cmux-team-status.sh     | Check team health via inbox files                    |
-| cmux-team-teardown.sh   | Graceful team shutdown with inbox messages            |
+| Script                       | Purpose                                              |
+|------------------------------|------------------------------------------------------|
+| scripts/cmux-env.sh          | Detect cmux context, validate socket, report status  |
+| scripts/cmux-spawn.sh        | Spawn session or browser in new surface/split        |
+| scripts/cmux-team-create.sh  | Create team surfaces + launch teammates with flags   |
+| scripts/cmux-team-status.sh  | Check team health via inbox files                    |
+| scripts/cmux-team-teardown.sh| Graceful team shutdown with inbox messages            |
 
 Run any script with `--help` for usage details.
 
@@ -92,11 +92,11 @@ Run any script with `--help` for usage details.
 
 <reference_index>
 
-**CLI & Commands:** cli-commands.md, browser-commands.md
-**Browser Patterns:** snapshot-refs.md
-**Teams:** team-protocol.md
-**Environment:** environment-and-config.md
-**Help:** troubleshooting.md
+**CLI & Commands:** references/cli-commands.md, references/browser-commands.md
+**Browser Patterns:** references/snapshot-refs.md
+**Teams:** references/team-protocol.md
+**Environment:** references/environment-and-config.md
+**Help:** references/troubleshooting.md
 
 </reference_index>
 
@@ -104,15 +104,25 @@ Run any script with `--help` for usage details.
 
 | Workflow | Purpose |
 |----------|---------|
-| open-browser.md | Open browser surface, wait for load, take initial snapshot |
-| automate-web-page.md | Click, fill, type, scroll — interact with page elements |
-| manage-layout.md | Create/switch/close workspaces, panes, surfaces |
-| spawn-session.md | Launch a new Claude session in a split or tab |
-| manage-state.md | Save/load auth, cookies, storage across surfaces |
-| monitor-and-notify.md | Set status pills, progress bars, notifications |
-| orchestrate-team.md | Create multi-agent team with inbox coordination (experimental) |
+| workflows/open-browser.md | Open browser surface, wait for load, take initial snapshot |
+| workflows/automate-web-page.md | Click, fill, type, scroll — interact with page elements |
+| workflows/manage-layout.md | Create/switch/close workspaces, panes, surfaces |
+| workflows/spawn-session.md | Launch a new Claude session in a split or tab |
+| workflows/manage-state.md | Save/load auth, cookies, storage across surfaces |
+| workflows/monitor-and-notify.md | Set status pills, progress bars, notifications |
+| workflows/orchestrate-team.md | Create multi-agent team with inbox coordination (experimental) |
 
 </workflows_index>
+
+<examples_index>
+
+| Example | Scenario |
+|---------|----------|
+| examples/website-evaluation.md | Full browser workflow: open site, audit pages, capture screenshots |
+| examples/multi-session-workflow.md | Spawn parallel sessions for test + dev server coordination |
+| examples/team-code-review.md | Multi-agent team reviewing code across files with inbox coordination |
+
+</examples_index>
 
 <success_criteria>
 
