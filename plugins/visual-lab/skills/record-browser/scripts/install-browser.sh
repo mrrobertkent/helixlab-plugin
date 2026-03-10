@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 DEPS_DIR="$PLUGIN_ROOT/.deps"
 
-echo "=== HelixLab: Installing Chrome for Testing ==="
+echo "=== Visual Lab: Installing Chrome for Testing ==="
 echo "Plugin root: $PLUGIN_ROOT"
 echo "Dependencies: $DEPS_DIR"
 

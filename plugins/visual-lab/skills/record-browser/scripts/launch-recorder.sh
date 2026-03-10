@@ -87,7 +87,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "=== HelixLab: Browser Recorder ==="
+echo "=== Visual Lab: Browser Recorder ==="
 echo "URL: $URL"
 echo "Output: $OUTPUT"
 echo "Chrome: $CHROME_PATH"
