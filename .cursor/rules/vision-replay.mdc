@@ -10,19 +10,19 @@ When working with video files, use the HelixLab vision-replay scripts for frame 
 
 ## Quick Start
 
-1. Get metadata: `bash skills/vision-replay/scripts/video-info.sh "<video>"`
-2. Normalize: `bash skills/vision-replay/scripts/normalize-video.sh "<video>" "/tmp/frames/normalized.mp4"`
-3. Deduplicate: `bash skills/vision-replay/scripts/dedupe-video.sh "/tmp/frames/normalized.mp4" "/tmp/frames/deduped.mp4" <threshold>`
-4. Contact sheet: `bash skills/vision-replay/scripts/contact-sheet.sh "/tmp/frames/deduped.mp4" "/tmp/frames/sheet.png"`
-5. Extract frames: `bash skills/vision-replay/scripts/extract-frames.sh "/tmp/frames/deduped.mp4" "/tmp/frames" 10`
-6. Batch if >20 frames: `bash skills/vision-replay/scripts/batch-frames.sh "/tmp/frames" 15`
-7. Clean up: `bash skills/vision-replay/scripts/cleanup.sh "/tmp/frames"`
+1. Get metadata: `bash plugins/visual-lab/skills/vision-replay/scripts/video-info.sh "<video>"`
+2. Normalize: `bash plugins/visual-lab/skills/vision-replay/scripts/normalize-video.sh "<video>" "/tmp/frames/normalized.mp4"`
+3. Deduplicate: `bash plugins/visual-lab/skills/vision-replay/scripts/dedupe-video.sh "/tmp/frames/normalized.mp4" "/tmp/frames/deduped.mp4" <threshold>`
+4. Contact sheet: `bash plugins/visual-lab/skills/vision-replay/scripts/contact-sheet.sh "/tmp/frames/deduped.mp4" "/tmp/frames/sheet.png"`
+5. Extract frames: `bash plugins/visual-lab/skills/vision-replay/scripts/extract-frames.sh "/tmp/frames/deduped.mp4" "/tmp/frames" 10`
+6. Batch if >20 frames: `bash plugins/visual-lab/skills/vision-replay/scripts/batch-frames.sh "/tmp/frames" 15`
+7. Clean up: `bash plugins/visual-lab/skills/vision-replay/scripts/cleanup.sh "/tmp/frames"`
 
 ## Workflow Guides
 
-- Animation: `skills/vision-replay/workflows/animation-analysis.md`
-- Page load: `skills/vision-replay/workflows/page-load-analysis.md`
-- Workflow review: `skills/vision-replay/workflows/workflow-review.md`
+- Animation: `plugins/visual-lab/skills/vision-replay/workflows/animation-analysis.md`
+- Page load: `plugins/visual-lab/skills/vision-replay/workflows/page-load-analysis.md`
+- Workflow review: `plugins/visual-lab/skills/vision-replay/workflows/workflow-review.md`
 
 ## FPS Selection
 
@@ -47,8 +47,8 @@ When working with video files, use the HelixLab vision-replay scripts for frame 
 HelixLab also includes a browser recording skill. Launch a headed Chrome with recording toolbar and annotation tools:
 
 ```bash
-bash skills/record-browser/scripts/install-browser.sh  # one-time setup
-bash skills/record-browser/scripts/launch-recorder.sh "[url]"
+bash plugins/visual-lab/skills/record-browser/scripts/install-browser.sh  # one-time setup
+bash plugins/visual-lab/skills/record-browser/scripts/launch-recorder.sh "[url]"
 ```
 
 Recordings save as WebM. Parse `HELIX_SAVED=<path>` from stdout to get the file path, then analyze with the vision-replay pipeline above. See `AGENTS.md` for the full Record Browser workflow.

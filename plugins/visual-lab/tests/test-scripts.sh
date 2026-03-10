@@ -163,7 +163,7 @@ if [[ "$CHECK_FFMPEG" == true ]]; then
   else
     echo "  WARN: drawtext filter missing — timestamp overlays will be disabled"
     echo "        macOS: Download static build from https://ffmpeg.martin-riedl.de"
-    echo "        macOS: Or run: bash scripts/setup.sh --yes"
+    echo "        macOS: Or run: bash plugins/visual-lab/scripts/setup.sh --yes"
     echo "        Linux: sudo apt install ffmpeg (includes drawtext by default)"
   fi
 fi

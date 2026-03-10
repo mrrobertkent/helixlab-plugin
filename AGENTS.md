@@ -9,7 +9,7 @@ HelixLab provides shell-script-based developer tools that any AI coding agent ca
 Run the setup script to check dependencies and get integration guidance for your agent:
 
 ```bash
-bash scripts/setup.sh --check
+bash plugins/visual-lab/scripts/setup.sh --check
 ```
 
 This detects your OS, verifies ffmpeg/ffprobe/bc are installed, identifies your AI coding agent, and provides tailored next steps.
@@ -19,7 +19,7 @@ This detects your OS, verifies ffmpeg/ffprobe/bc are installed, identifies your 
 Before using any HelixLab tools, ensure these are installed:
 
 - **ffmpeg** and **ffprobe** (video processing)
-  - macOS: Run `bash scripts/setup.sh` to auto-detect and install a fully-featured ffmpeg
+  - macOS: Run `bash plugins/visual-lab/scripts/setup.sh` to auto-detect and install a fully-featured ffmpeg
   - Or download directly from https://ffmpeg.martin-riedl.de (static builds with all filters)
   - The standard `brew install ffmpeg` on macOS does NOT include drawtext (timestamp overlays)
   - Linux: `sudo apt install ffmpeg bc` (includes drawtext by default)
@@ -46,7 +46,7 @@ Extracts frames from video files using ffmpeg and analyzes them with AI vision. 
 **Step 1: Get video metadata**
 
 ```bash
-bash skills/vision-replay/scripts/video-info.sh "<video-path>"
+bash plugins/visual-lab/skills/vision-replay/scripts/video-info.sh "<video-path>"
 ```
 
 Returns: duration, fps, resolution, codec, frame count, VFR detection.
@@ -56,7 +56,7 @@ Returns: duration, fps, resolution, codec, frame count, VFR detection.
 ```bash
 WORK_DIR="/tmp/claude-video-frames/$(date +%s)"
 mkdir -p "$WORK_DIR"
-bash skills/vision-replay/scripts/normalize-video.sh "<video-path>" "$WORK_DIR/normalized.mp4"
+bash plugins/visual-lab/skills/vision-replay/scripts/normalize-video.sh "<video-path>" "$WORK_DIR/normalized.mp4"
 ```
 
 Caps the longest dimension at 1920px (desktop, mobile, tablet — all handled dynamically). Burns timestamp overlay into frames if ffmpeg has libfreetype support. Timestamps must be applied BEFORE dedup so timing gaps are visible in the final frames.
@@ -69,7 +69,7 @@ Choose a threshold based on the analysis type:
 - **15** for workflow review (keeps only major state changes)
 
 ```bash
-bash skills/vision-replay/scripts/dedupe-video.sh "$WORK_DIR/normalized.mp4" "$WORK_DIR/deduped.mp4" <threshold>
+bash plugins/visual-lab/skills/vision-replay/scripts/dedupe-video.sh "$WORK_DIR/normalized.mp4" "$WORK_DIR/deduped.mp4" <threshold>
 ```
 
 Removes frames with no visual change, producing a shorter video. Use the deduped video for all subsequent steps if reduction is significant (>10%). Reports original duration, deduped duration, and reduction percentage.
@@ -77,7 +77,7 @@ Removes frames with no visual change, producing a shorter video. Use the deduped
 **Step 4: Generate contact sheet overview**
 
 ```bash
-bash skills/vision-replay/scripts/contact-sheet.sh "$WORK_DIR/deduped.mp4" "$WORK_DIR/contact-sheet.png" 5 5
+bash plugins/visual-lab/skills/vision-replay/scripts/contact-sheet.sh "$WORK_DIR/deduped.mp4" "$WORK_DIR/contact-sheet.png" 5 5
 ```
 
 View the contact sheet to understand what's in the video.
@@ -86,38 +86,38 @@ View the contact sheet to understand what's in the video.
 
 For animation analysis (configurable fps):
 ```bash
-bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 10
+bash plugins/visual-lab/skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 10
 ```
 
 For page load analysis (progressive intervals):
 ```bash
-bash skills/vision-replay/scripts/extract-progressive.sh "<video-path>" "$WORK_DIR/frames"
+bash plugins/visual-lab/skills/vision-replay/scripts/extract-progressive.sh "<video-path>" "$WORK_DIR/frames"
 ```
 
 For workflow review (low fps or scene detection):
 ```bash
-bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 2
+bash plugins/visual-lab/skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" 2
 # OR with scene detection:
-bash skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" --scene-detect
+bash plugins/visual-lab/skills/vision-replay/scripts/extract-frames.sh "<video-path>" "$WORK_DIR/frames" --scene-detect
 ```
 
 **Step 6: Batch frames if needed (>20 frames)**
 
 ```bash
-bash skills/vision-replay/scripts/batch-frames.sh "$WORK_DIR/frames" 15
+bash plugins/visual-lab/skills/vision-replay/scripts/batch-frames.sh "$WORK_DIR/frames" 15
 ```
 
 **Step 7: Analyze frames visually**
 
 Read the extracted PNG frames and analyze them based on the workflow type. See workflow guides:
-- `skills/vision-replay/workflows/animation-analysis.md`
-- `skills/vision-replay/workflows/page-load-analysis.md`
-- `skills/vision-replay/workflows/workflow-review.md`
+- `plugins/visual-lab/skills/vision-replay/workflows/animation-analysis.md`
+- `plugins/visual-lab/skills/vision-replay/workflows/page-load-analysis.md`
+- `plugins/visual-lab/skills/vision-replay/workflows/workflow-review.md`
 
 **Step 8: Clean up**
 
 ```bash
-bash skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
+bash plugins/visual-lab/skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
 ```
 
 ### Script Reference
@@ -136,12 +136,12 @@ bash skills/vision-replay/scripts/cleanup.sh "$WORK_DIR"
 
 ### Domain References
 
-- `skills/vision-replay/references/fps-strategy.md` — When to use 5, 10, 30, or 60 fps
-- `skills/vision-replay/references/ffmpeg-recipes.md` — Common ffmpeg filter chains
-- `skills/vision-replay/examples/animation-report.md` — Example animation analysis report
-- `skills/vision-replay/examples/page-load-report.md` — Example page load analysis report
-- `skills/vision-replay/examples/workflow-report.md` — Example workflow review report
-- `skills/vision-replay/examples/error-handling.md` — Common error scenarios and recovery actions
+- `plugins/visual-lab/skills/vision-replay/references/fps-strategy.md` — When to use 5, 10, 30, or 60 fps
+- `plugins/visual-lab/skills/vision-replay/references/ffmpeg-recipes.md` — Common ffmpeg filter chains
+- `plugins/visual-lab/skills/vision-replay/examples/animation-report.md` — Example animation analysis report
+- `plugins/visual-lab/skills/vision-replay/examples/page-load-report.md` — Example page load analysis report
+- `plugins/visual-lab/skills/vision-replay/examples/workflow-report.md` — Example workflow review report
+- `plugins/visual-lab/skills/vision-replay/examples/error-handling.md` — Common error scenarios and recovery actions
 
 ### Record Browser — Browser Recording with Annotations
 
@@ -154,7 +154,7 @@ Launch a headed Chrome browser with built-in recording controls and annotation t
 Do NOT check for dependencies manually. Just run the launch script — it validates Chrome internally and exits with a clear error if missing.
 
 ```bash
-SCRIPTS_DIR="${CLAUDE_PLUGIN_ROOT}/skills/record-browser/scripts"
+SCRIPTS_DIR="${CLAUDE_PLUGIN_ROOT}/plugins/visual-lab/skills/record-browser/scripts"
 bash "$SCRIPTS_DIR/launch-recorder.sh" "[url]"
 ```
 
@@ -196,7 +196,7 @@ When you stop, a dialog appears with video playback, editable filename, and butt
 
 **Step 5: Ask user what to do next (MANDATORY — wait for response)**
 
-Print the saved file path FIRST, then call AskUserQuestion using **Template 1** from `skills/record-browser/references/question-templates.md`. Do NOT auto-answer.
+Print the saved file path FIRST, then call AskUserQuestion using **Template 1** from `plugins/visual-lab/skills/record-browser/references/question-templates.md`. Do NOT auto-answer.
 
 - "Keep as artifact" → report path and stop.
 - "Analyze with Vision Replay" → ask **Template 2** (preparation method), then **Template 3** (analysis mode), then run the vision-replay pipeline.

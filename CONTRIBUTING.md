@@ -16,11 +16,13 @@ By participating in this project, you agree to treat all contributors with respe
    - Steps to reproduce the problem
    - Expected vs actual behavior
    - Your OS, ffmpeg version (`ffmpeg -version`), and AI agent (Claude Code, Cursor, etc.)
+   - Which plugin is affected (visual-lab, control-cmux)
 
 ### Suggesting Features
 
 Open an issue with the `enhancement` label describing:
 - The problem your feature would solve
+- Which plugin it applies to (or if it's a new plugin)
 - Your proposed solution
 - Any alternatives you've considered
 
@@ -31,7 +33,7 @@ Open an issue with the `enhancement` label describing:
 3. **Make your changes** following the conventions below
 4. **Run the tests** to verify nothing is broken:
    ```bash
-   bash tests/test-scripts.sh --check-ffmpeg
+   bash plugins/visual-lab/tests/test-scripts.sh --check-ffmpeg
    ```
 5. **Commit** using [conventional commits](#commit-messages)
 6. **Push** your branch and open a **Pull Request** against `main`
@@ -45,13 +47,14 @@ Use conventional commit prefixes:
 ```
 feat(vision-replay): add scene detection extraction mode
 fix(setup): handle missing bc on minimal Ubuntu installs
+feat(control-cmux): add window management workflow
 docs: update README installation instructions
 test: add video-info.sh output validation
-chore: bump version to 1.0.2
+chore: bump version to 2.0.1
 refactor(vision-replay): simplify fps selection logic
 ```
 
-Scope to the skill name when the change is skill-specific.
+Scope to the plugin or skill name when the change is skill-specific.
 
 ### Bash Scripts
 
@@ -60,13 +63,13 @@ All scripts must:
 - Start with `#!/bin/bash` and `set -euo pipefail`
 - Print usage to stderr and exit 1 when called with no or invalid arguments
 - Be executable (`chmod +x`)
-- Accept any ffmpeg-supported video format — never filter by file extension
+- Accept any ffmpeg-supported video format — never filter by file extension (for visual-lab scripts)
 - Use `/tmp/claude-video-frames/<timestamp>/` for frame output directories
 - Include a header comment with script name, purpose, and usage
 
-### Adding a New Skill
+### Adding a New Skill (to an existing plugin)
 
-1. Create `skills/<skill-name>/SKILL.md` with YAML frontmatter:
+1. Create `plugins/<plugin-name>/skills/<skill-name>/SKILL.md` with YAML frontmatter:
    ```yaml
    ---
    name: your-skill-name
@@ -78,20 +81,40 @@ All scripts must:
      - Read
    ---
    ```
-2. Add any scripts to `skills/<skill-name>/scripts/`
-3. Add workflow guides to `skills/<skill-name>/workflows/` if applicable
+2. Add any scripts to `plugins/<plugin-name>/skills/<skill-name>/scripts/`
+3. Add workflow guides to `plugins/<plugin-name>/skills/<skill-name>/workflows/` if applicable
 4. Update these files with your skill's instructions:
    - `AGENTS.md` — used by Cursor, Codex, Kiro, and most agents
    - `GEMINI.md` — used by Google Gemini
    - `.cursor/rules/` — add a `.mdc` file for automatic Cursor context injection
-5. Add your skill to the table in `skills/help/SKILL.md`
-6. Add tests to `tests/`
+5. Add your skill to the help SKILL.md table in the relevant plugin
+6. Add tests to `plugins/<plugin-name>/tests/`
 7. Update `README.md` with a section under "Available Skills"
+
+### Adding a New Plugin
+
+1. Create `plugins/<plugin-name>/` with this structure:
+   ```
+   plugins/<plugin-name>/
+     .claude-plugin/
+       plugin.json           # Plugin manifest (name, version, author, category)
+     skills/
+       <skill-name>/
+         SKILL.md            # Skill definition (required)
+         scripts/            # Bash scripts (if applicable)
+         workflows/          # Step-by-step guides (if applicable)
+         references/         # Domain knowledge (if applicable)
+         examples/           # Example reports (if applicable)
+     tests/                  # Test scripts (if applicable)
+   ```
+2. Add the plugin entry to `.claude-plugin/marketplace.json` in the `plugins` array
+3. Update `README.md` with the new plugin
+4. Update `AGENTS.md` and `GEMINI.md` if the plugin provides multi-agent instructions
 
 ### Skill Structure
 
 ```
-skills/<skill-name>/
+plugins/<plugin-name>/skills/<skill-name>/
   SKILL.md              # Skill definition (required)
   scripts/              # Bash scripts (if applicable)
   workflows/            # Step-by-step analysis guides (if applicable)
@@ -101,13 +124,16 @@ skills/<skill-name>/
 
 ### Versioning
 
-We use [Semantic Versioning](https://semver.org/) in `.claude-plugin/plugin.json`:
+We use [Semantic Versioning](https://semver.org/). Versions are tracked in:
+- `.claude-plugin/plugin.json` — marketplace-level version
+- `.claude-plugin/marketplace.json` — per-plugin version in the `plugins` array
+- `plugins/<plugin-name>/.claude-plugin/plugin.json` — plugin-level version
 
 | Change Type | Bump | Example |
 |------------|------|---------|
-| Bug fixes, doc tweaks | PATCH (0.0.x) | `1.0.0` → `1.0.1` |
-| New skills, new scripts, new capabilities | MINOR (0.x.0) | `1.0.1` → `1.1.0` |
-| Breaking changes (removed/renamed commands) | MAJOR (x.0.0) | `1.1.0` → `2.0.0` |
+| Bug fixes, doc tweaks | PATCH (0.0.x) | `1.0.0` -> `1.0.1` |
+| New skills, new scripts, new capabilities | MINOR (0.x.0) | `1.0.1` -> `1.1.0` |
+| Breaking changes (removed/renamed commands) | MAJOR (x.0.0) | `1.1.0` -> `2.0.0` |
 
 Maintainers handle version bumps — contributors do not need to update the version number in PRs.
 
@@ -115,15 +141,16 @@ Maintainers handle version bumps — contributors do not need to update the vers
 
 - Keep PRs focused — one feature or fix per PR
 - Include a clear description of what changed and why
+- Specify which plugin is affected
 - Link any related issues
 - Ensure all tests pass before requesting review
 - Add tests for new scripts
 
 ## Testing
 
-Run the full test suite:
+Run the visual-lab test suite:
 ```bash
-bash tests/test-scripts.sh --check-ffmpeg
+bash plugins/visual-lab/tests/test-scripts.sh --check-ffmpeg
 ```
 
 This validates:

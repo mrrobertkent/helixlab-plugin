@@ -14,18 +14,30 @@ jobs:
 
       - name: Validate JSON syntax
         run: |
-          echo "=== Validating plugin.json ==="
+          echo "=== Validating marketplace-level plugin.json ==="
           python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))"
-          echo "  PASS: plugin.json is valid JSON"
+          echo "  PASS: .claude-plugin/plugin.json is valid JSON"
 
           echo ""
           echo "=== Validating marketplace.json ==="
           python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"
-          echo "  PASS: marketplace.json is valid JSON"
+          echo "  PASS: .claude-plugin/marketplace.json is valid JSON"
+
+          echo ""
+          echo "=== Validating plugin-level plugin.json files ==="
+          for pdir in plugins/*/; do
+            pjson="$pdir.claude-plugin/plugin.json"
+            if [ -f "$pjson" ]; then
+              python3 -c "import json; json.load(open('$pjson'))"
+              echo "  PASS: $pjson is valid JSON"
+            else
+              echo "  WARN: $pjson not found"
+            fi
+          done
 
       - name: Check required fields
         run: |
-          echo "=== Checking plugin.json required fields ==="
+          echo "=== Checking marketplace-level plugin.json required fields ==="
           python3 -c "
           import json, sys
           data = json.load(open('.claude-plugin/plugin.json'))
@@ -58,31 +70,39 @@ jobs:
           print(f'  PASS: marketplace={data[\"name\"]}, plugins={len(data[\"plugins\"])}')
           "
 
-      - name: Check version sync
+      - name: Check version sync across all plugins
         run: |
-          echo "=== Checking version sync between plugin.json and marketplace.json ==="
+          echo "=== Checking version sync between plugin.json files and marketplace.json ==="
           python3 -c "
-          import json, sys
-          plugin = json.load(open('.claude-plugin/plugin.json'))
+          import json, sys, os
+
           marketplace = json.load(open('.claude-plugin/marketplace.json'))
+          errors = []
 
-          plugin_version = plugin.get('version')
-          marketplace_version = None
-          for p in marketplace.get('plugins', []):
-              if p.get('name') == plugin.get('name'):
-                  marketplace_version = p.get('version')
-                  break
+          for mp in marketplace.get('plugins', []):
+              name = mp.get('name')
+              mp_version = mp.get('version')
+              source = mp.get('source', '')
 
-          if not plugin_version:
-              print('  FAIL: No version in plugin.json')
+              plugin_json_path = os.path.join(source, '.claude-plugin', 'plugin.json')
+              if os.path.exists(plugin_json_path):
+                  plugin_data = json.load(open(plugin_json_path))
+                  plugin_version = plugin_data.get('version')
+                  plugin_name = plugin_data.get('name')
+
+                  if plugin_name != name:
+                      errors.append(f'{name}: name mismatch — marketplace.json={name}, {plugin_json_path}={plugin_name}')
+                  if plugin_version != mp_version:
+                      errors.append(f'{name}: version mismatch — marketplace.json={mp_version}, {plugin_json_path}={plugin_version}')
+                  else:
+                      print(f'  PASS: {name} versions in sync at {mp_version}')
+              else:
+                  errors.append(f'{name}: plugin.json not found at {plugin_json_path}')
+
+          if errors:
+              for e in errors:
+                  print(f'  FAIL: {e}')
               sys.exit(1)
-          if not marketplace_version:
-              print('  FAIL: No version in marketplace.json for plugin')
-              sys.exit(1)
-          if plugin_version != marketplace_version:
-              print(f'  FAIL: Version mismatch — plugin.json={plugin_version}, marketplace.json={marketplace_version}')
-              sys.exit(1)
-          print(f'  PASS: Versions in sync at {plugin_version}')
           "
 
       - name: Validate semver format
@@ -90,11 +110,21 @@ jobs:
           echo "=== Checking semver format ==="
           python3 -c "
           import json, re, sys
+
           version = json.load(open('.claude-plugin/plugin.json')).get('version', '')
           if not re.match(r'^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$', version):
-              print(f'  FAIL: \"{version}\" is not valid semver (expected MAJOR.MINOR.PATCH)')
+              print(f'  FAIL: marketplace version is not valid semver')
               sys.exit(1)
-          print(f'  PASS: {version} is valid semver')
+          print(f'  PASS: marketplace version {version} is valid semver')
+
+          marketplace = json.load(open('.claude-plugin/marketplace.json'))
+          for p in marketplace.get('plugins', []):
+              v = p.get('version', '')
+              name = p.get('name', 'unknown')
+              if not re.match(r'^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$', v):
+                  print(f'  FAIL: {name} version is not valid semver')
+                  sys.exit(1)
+              print(f'  PASS: {name} version {v} is valid semver')
           "
 
   test-scripts:
@@ -105,5 +135,5 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg bc
 
-      - name: Run script tests
-        run: bash tests/test-scripts.sh --check-ffmpeg
+      - name: Run visual-lab script tests
+        run: bash plugins/visual-lab/tests/test-scripts.sh --check-ffmpeg
