@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # HelixLab — Developer Tools for AI Coding Agents
 
-**Version:** 1.2.0
+**Version:** 1.2.1
 **License:** MIT
 **Author:** Robert Kent Jr.
 **Homepage:** https://github.com/mrrobertkent/helixlab-plugin
@@ -18,6 +18,14 @@ disable-model-invocation: true
 | Vision Replay | `/helixlab:vision-replay <video-path> [instructions]` | Extract frames from video files using ffmpeg and analyze them with AI vision. Supports animation timing analysis, page load performance review, and user workflow progression. |
 | Record Browser | `/helixlab:record-browser [url]` | Launch a headed Chrome browser with recording controls and annotation tools. Draw annotations (lines, arrows, rectangles, circles, text) on the page — captured in the WebM recording for AI analysis with vision-replay. |
 | Setup | `/helixlab:setup [--check]` | Check prerequisites and install dependencies (ffmpeg, ffprobe, bc). Detects your OS and AI coding agent for tailored setup guidance. |
+
+## More from the HelixLab Marketplace
+
+| Plugin | Install | Description |
+|--------|---------|-------------|
+| No AI Slop | `/plugin install no-ai-slop@helixlab` | Removes 20+ patterns of AI slop from writing while preserving the writer's voice. Invoke with `/no-ai-slop:no-ai-slop`. |
+
+Run `/plugin marketplace update helixlab` to refresh the plugin list.
 
 ## Prerequisites
 
