@@ -1,21 +1,44 @@
 {
   "name": "helixlab",
-  "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
+  "description": "AI agent tooling marketplace. Plugins, skills, hooks, agents, and MCP servers for Claude Code, Claude Desktop, claude.ai, and Codex CLI.",
   "owner": {
     "name": "Robert Kent Jr.",
     "url": "https://helixlab.app"
+  },
+  "metadata": {
+    "version": "1.3.0",
+    "description": "AI agent tooling marketplace. Plugins, skills, hooks, agents, and MCP servers for Claude Code, Claude Desktop, claude.ai, and Codex CLI."
   },
   "plugins": [
     {
       "name": "helixlab",
       "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
-      "version": "1.2.0",
       "source": "./",
       "author": {
         "name": "Robert Kent Jr.",
         "url": "https://helixlab.app"
       },
       "category": "development"
+    },
+    {
+      "name": "no-ai-slop",
+      "description": "Removes 20+ patterns of AI slop from any piece of writing while preserving the writer's voice",
+      "source": "./plugins/no-ai-slop",
+      "author": {
+        "name": "Robert Kent Jr.",
+        "url": "https://helixlab.app"
+      },
+      "homepage": "https://github.com/mrrobertkent/helixlab-plugin/tree/main/plugins/no-ai-slop",
+      "license": "MIT",
+      "keywords": [
+        "writing",
+        "editing",
+        "voice",
+        "ai-slop",
+        "prose",
+        "ai-skills"
+      ],
+      "category": "productivity"
     }
   ]
 }

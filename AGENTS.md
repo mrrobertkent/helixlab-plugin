@@ -204,3 +204,18 @@ Print the saved file path FIRST, then call AskUserQuestion using **Template 1** 
 **Step 6: Post-analysis cleanup (MANDATORY — wait for response)**
 
 Call AskUserQuestion using **Template 4** from the same file. Only delete if user chooses "Delete recording".
+
+---
+
+## No AI Slop (separate plugin)
+
+The HelixLab marketplace also ships a `no-ai-slop` plugin at `plugins/no-ai-slop/`. It needs no scripts and no dependencies.
+
+To use it with a non-Claude agent, point your agent at `plugins/no-ai-slop/skills/no-ai-slop/SKILL.md` and follow it directly:
+
+- **Edit (default):** return the edited draft plus a **What changed** section
+- **Detect:** name each slop pattern with a quoted line and a short fix, without rewriting
+
+Check the result against `plugins/no-ai-slop/skills/no-ai-slop/eval.md` before returning it, and fix any failed check.
+
+The skill is by Peter Yang (https://github.com/petergyang/no-ai-slop), MIT licensed and included unmodified.

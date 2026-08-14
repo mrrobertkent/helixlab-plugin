@@ -2,14 +2,32 @@
 
 > Open-source developer tools and skills for AI coding agents
 
-HelixLab is a growing collection of developer tools that work with any AI coding agent. Each tool is a self-contained set of bash scripts and markdown workflow guides — no dependencies beyond standard Unix tools and ffmpeg.
+HelixLab is a growing collection of developer tools that work with any AI coding agent. Each tool is a self-contained set of bash scripts and markdown workflow guides, with no dependencies beyond standard Unix tools and ffmpeg.
+
+This repository is also a **Claude Code marketplace**. Add it once and install any plugin below.
+
+## Plugins
+
+| Plugin | Version | What it does | Install |
+|--------|---------|--------------|---------|
+| [`helixlab`](#available-skills) | 1.2.1 | Video and browser tooling for AI agents: vision replay, record browser, setup, help | `/plugin install helixlab@helixlab` |
+| [`no-ai-slop`](plugins/no-ai-slop/) | 1.0.0 | Removes 20+ patterns of AI slop from writing while preserving the writer's voice | `/plugin install no-ai-slop@helixlab` |
+
+Add the marketplace first:
+
+```
+/plugin marketplace add https://github.com/mrrobertkent/helixlab-plugin
+```
+
+> [!TIP]
+> Already have the marketplace? Run `/plugin marketplace update helixlab` to pick up new plugins and version bumps.
 
 ---
 
 ## Prerequisites
 
 > [!IMPORTANT]
-> ffmpeg must be installed before using any HelixLab tools. Without it, video analysis scripts will fail immediately.
+> ffmpeg is required by the **`helixlab`** plugin only. Without it, the video analysis scripts fail immediately. The `no-ai-slop` plugin has no dependencies.
 >
 > The setup skill can detect your OS and handle installation automatically:
 > ```
@@ -40,18 +58,21 @@ bash tests/test-scripts.sh --check-ffmpeg
 
 ## Installation
 
-### Claude Code (Plugin)
+### Claude Code (Plugins)
 
-Add the marketplace and install:
+Add the marketplace once, then install the plugins you want:
 ```
 /plugin marketplace add https://github.com/mrrobertkent/helixlab-plugin
-/plugin install helixlab
+/plugin install helixlab@helixlab
+/plugin install no-ai-slop@helixlab
 ```
 
 Then invoke skills directly:
 ```
 /helixlab:vision-replay <video-path> <analysis-prompt>
+/helixlab:record-browser
 /helixlab:help
+/no-ai-slop:no-ai-slop
 ```
 
 > Any ffmpeg-supported format works: mp4, webm, mov, mkv, avi, flv, etc.
@@ -59,7 +80,7 @@ Then invoke skills directly:
 > [!TIP]
 > Use `--scope project` when installing to share the plugin configuration with teammates via Git:
 > ```
-> /plugin install helixlab --scope project
+> /plugin install helixlab@helixlab --scope project
 > ```
 
 <details>
@@ -72,7 +93,7 @@ Then invoke skills directly:
 
 HelixLab ships `.cursor/rules/` for automatic context injection. Clone the repo and Cursor will detect the rules when video files are in context.
 
-Alternatively, copy `AGENTS.md` to your project root — Cursor reads `AGENTS.md` natively.
+Alternatively, copy `AGENTS.md` to your project root. Cursor reads `AGENTS.md` natively.
 
 #### OpenAI Codex
 
@@ -83,7 +104,7 @@ Codex reads `AGENTS.md` automatically. Clone or copy `AGENTS.md` to your project
 Gemini reads `GEMINI.md` automatically. Clone or copy `GEMINI.md` to your project root.
 
 > [!TIP]
-> Gemini supports hierarchical config — a global `~/.gemini/GEMINI.md` plus a project-level `GEMINI.md`. You can also configure Gemini CLI to read `AGENTS.md`:
+> Gemini supports hierarchical config: a global `~/.gemini/GEMINI.md` plus a project-level `GEMINI.md`. You can also configure Gemini CLI to read `AGENTS.md`:
 > ```json
 > // ~/.gemini/settings.json
 > { "context": { "fileName": ["AGENTS.md", "GEMINI.md"] } }
@@ -102,7 +123,7 @@ All of these agents support the `AGENTS.md` standard. Clone or copy `AGENTS.md` 
 <details>
 <summary><strong>Manual (Any Agent)</strong></summary>
 
-All scripts work standalone — no plugin system required:
+All scripts work standalone. No plugin system required:
 
 ```bash
 git clone https://github.com/mrrobertkent/helixlab-plugin.git
@@ -136,6 +157,8 @@ Or use the skill in Claude Code:
 ---
 
 ## Available Skills
+
+Skills below ship in the **`helixlab`** plugin. The `no-ai-slop` plugin is documented separately in [`plugins/no-ai-slop/README.md`](plugins/no-ai-slop/README.md).
 
 ### Vision Replay
 
@@ -179,7 +202,7 @@ bash skills/vision-replay/scripts/cleanup.sh /tmp/frames
 Launch a headed Chrome browser with built-in recording and annotation tools. Navigate manually while recording, draw annotations directly on the page, and save WebM recordings for AI analysis.
 
 > [!NOTE]
-> Record Browser requires **Node.js 22+**. The install script downloads a self-contained Chrome for Testing binary — no npm packages or global browser install needed.
+> Record Browser requires **Node.js 22+**. The install script downloads a self-contained Chrome for Testing binary, so no npm packages or global browser install are needed.
 
 **Features:**
 
@@ -188,12 +211,12 @@ Launch a headed Chrome browser with built-in recording and annotation tools. Nav
 | Glassmorphism toolbar | Record, On Action, pause/stop, restart |
 | 6 drawing tools | Select, Pen, Line, Rectangle, Circle, Text (via fabric.js) |
 | Lines & arrows | Plain line, arrow at end, arrow at start, double arrow |
-| 5 color presets | Red, yellow, blue, green, white — optimized for AI vision |
+| 5 color presets | Red, yellow, blue, green, white, optimized for AI vision |
 | Stroke & fill | 4 stroke widths (1/2/3/5px), semi-transparent fill toggle for shapes |
 | Text formatting | 4 sizes (S/M/L/XL), background toggle (BG), border toggle (BD) |
 | Keyboard shortcuts | Space, D, Esc, Ctrl+Z, C, 1-4, Delete, Shift (constrain), ⌘/Ctrl+Click (multi-select) |
 | Post-recording dialog | Video playback, expand overlay, rename, save & close |
-| Welcome page | Launches when no URL provided — includes full tool reference |
+| Welcome page | Launches when no URL is provided. Includes full tool reference |
 
 **How it works with Vision Replay:**
 
@@ -206,10 +229,10 @@ Record Browser captures annotated recordings. Vision Replay analyzes them. The t
 <summary><strong>Quick start</strong></summary>
 
 ```bash
-# Install browser dependencies (one-time — downloads Chrome for Testing)
+# Install browser dependencies (one-time, downloads Chrome for Testing)
 bash skills/record-browser/scripts/install-browser.sh
 
-# Launch recorder (opens welcome page — navigate via address bar)
+# Launch recorder (opens welcome page, navigate via address bar)
 bash skills/record-browser/scripts/launch-recorder.sh
 
 # Or launch directly at a URL
@@ -231,7 +254,7 @@ bash skills/record-browser/scripts/launch-recorder.sh "https://example.com"
 | Windows (WSL2 + WSLg) | Supported | Windows 11 with WSLg provides GUI support automatically |
 | Windows (WSL2, older) | Requires setup | Install an X server (VcXsrv, X410) and set `DISPLAY` |
 
-Record Browser launches a **headed** (visible) Chrome window — it cannot run headless since the user needs to interact with the browser to navigate and annotate.
+Record Browser launches a **headed** (visible) Chrome window. It cannot run headless because the user needs to interact with the browser to navigate and annotate.
 
 </details>
 
@@ -244,12 +267,55 @@ Record Browser launches a **headed** (visible) Chrome window — it cannot run h
 | `Node.js 22+ is required` | Install Node.js 22+ from [nodejs.org](https://nodejs.org) |
 | Chrome window doesn't appear (WSL2) | Install WSLg (Windows 11) or an X server and set `DISPLAY=:0` |
 | Blank recording | Ensure you clicked Record or On Action before interacting |
-| Annotations not visible in recording | Annotations are captured automatically — ensure Draw mode was active when drawing |
+| Annotations not visible in recording | Annotations are captured automatically. Ensure Draw mode was active when drawing |
 
 </details>
 
 > [!NOTE]
 > **Known Issue:** Chrome for Testing v146 may show a "quit unexpectedly" dialog when the browser is closed. This is cosmetic and does not affect recording or video saving.
+
+---
+
+## No AI Slop
+
+A separate plugin in this marketplace. It edits drafts into sharper, more human writing by cutting 20+ AI-slop patterns, and it keeps the writer's voice intact.
+
+```
+/plugin install no-ai-slop@helixlab
+/no-ai-slop:no-ai-slop
+```
+
+| Mode | Trigger | Output |
+|------|---------|--------|
+| Edit (default) | "Clean this up", "make this less AI-sounding", or a pasted draft | Edited draft plus a **What changed** section |
+| Detect | "Is this AI slop?", "audit this", "flag the patterns" | Each pattern named with a quoted line and a short fix. No rewrite. |
+
+It removes binary contrasts ("It's not X. It's Y."), throat-clearing openers, faux-insight setups, colon reveals, importance puffery, weasel attribution, fake-profound kickers, summary-recap endings, formatting slop, em dash overuse, and a banned word list including delve, leverage, robust, and transformative.
+
+> [!NOTE]
+> The `no-ai-slop` skill is by [Peter Yang](https://github.com/petergyang/no-ai-slop), MIT licensed and included unmodified. HelixLab repackages it as an installable, version-tracked Claude Code plugin. See [`plugins/no-ai-slop/README.md`](plugins/no-ai-slop/README.md) for the full pattern list and attribution.
+
+---
+
+## Repository Layout
+
+```
+.claude-plugin/
+  marketplace.json      # Marketplace manifest, lists every plugin
+  plugin.json           # Manifest for the root `helixlab` plugin
+skills/                 # `helixlab` plugin skills
+scripts/                # `helixlab` setup script
+tests/                  # `helixlab` script tests
+plugins/
+  no-ai-slop/           # `no-ai-slop` plugin (self-contained)
+    .claude-plugin/plugin.json
+    skills/no-ai-slop/
+    README.md
+    LICENSE
+```
+
+> [!IMPORTANT]
+> A plugin's version lives in its own `.claude-plugin/plugin.json` and nowhere else. Claude Code always prefers that value over a `version` in the marketplace entry, so a copy left in `marketplace.json` is dead text that can silently contradict the real one. Releases are tagged `{plugin-name}--v{version}` with `claude plugin tag --push`. See [CONTRIBUTING.md](CONTRIBUTING.md#versioning).
 
 ---
 
@@ -264,4 +330,4 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidel
 
 ## License
 
-[MIT](LICENSE) — Robert Kent Jr.
+[MIT](LICENSE). Copyright (c) 2026 Robert Kent Jr.

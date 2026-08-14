@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "no-ai-slop",
+  "description": "Removes 20+ patterns of AI slop from any piece of writing while preserving the writer's voice",
+  "version": "1.0.0",
+  "author": {
+    "name": "Robert Kent Jr.",
+    "url": "https://helixlab.app"
+  },
+  "homepage": "https://github.com/mrrobertkent/helixlab-plugin/tree/main/plugins/no-ai-slop",
+  "repository": "https://github.com/mrrobertkent/helixlab-plugin",
+  "license": "MIT",
+  "keywords": [
+    "writing",
+    "editing",
+    "voice",
+    "ai-slop",
+    "prose",
+    "ai-skills"
+  ]
+}

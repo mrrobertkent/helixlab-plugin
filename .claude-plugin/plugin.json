@@ -1,7 +1,8 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "helixlab",
   "description": "A growing collection of developer tools and skills for AI-powered coding workflows",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": {
     "name": "Robert Kent Jr.",
     "url": "https://helixlab.app"
@@ -9,5 +10,13 @@
   "homepage": "https://github.com/mrrobertkent/helixlab-plugin",
   "repository": "https://github.com/mrrobertkent/helixlab-plugin",
   "license": "MIT",
-  "keywords": ["developer-tools", "video", "vision", "frames", "analysis", "ffmpeg", "ai-skills"]
+  "keywords": [
+    "developer-tools",
+    "video",
+    "vision",
+    "frames",
+    "analysis",
+    "ffmpeg",
+    "ai-skills"
+  ]
 }
